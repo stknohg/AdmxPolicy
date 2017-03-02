@@ -24,7 +24,7 @@
             LicenseUri = 'https://github.com/stknohg/AdmxPolicy/blob/master/LICENSE'
             # IconUri = ''
             # ReleaseNotes = ''
-            Tags = @('Group Policy', 'Admx', 'Adml')
+            Tags = @('GroupPolicy', 'Admx', 'Adml')
         }
     }
 }
