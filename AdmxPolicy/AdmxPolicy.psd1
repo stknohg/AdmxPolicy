@@ -3,7 +3,7 @@
 #
 @{
     GUID = 'b05e2e20-3743-443a-b977-5e0b93b418b4'
-    ModuleVersion = '0.1'
+    ModuleVersion = '0.2'
     Description = 'Get group policy information from ADMX files.(Beta)'
 
     Author = 'stknohg'
@@ -11,7 +11,6 @@
     Copyright = '(c) 2017 stknohg. All rights reserved.'
 
     PowerShellVersion = '2.0'
-    PowerShellHostVersion = '2.0'
     NestedModules = @('AddTypes.psm1', 'AdmxPolicy.psm1')
     # TypesToProcess = @()
     FormatsToProcess = @('AdmxPolicy.format.ps1xml')
