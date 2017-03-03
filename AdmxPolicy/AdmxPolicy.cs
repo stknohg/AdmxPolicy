@@ -57,5 +57,74 @@ namespace AdmxPolicy
         public RegistryTypes RegistryType { get { return _RegistryType; } set { _RegistryType = value; } }
         private string[] _RegistryPath;
         public string[] RegistryPath { get { return _RegistryPath; } set { _RegistryPath = value; } }
+        private PolicyValueInfo _ValueInfo;
+        public PolicyValueInfo ValueInfo { get { return _ValueInfo; } set { _ValueInfo = value; } }
+    }
+
+    public enum ValueTypes
+    {
+        Unknown = 0,
+        Delete,
+        Decimal,
+        LongDecimal,
+        String
+    }
+
+    public sealed class ValueDefinition
+    {
+        private ValueTypes _Type;
+        public ValueTypes Type { get { return _Type; } }
+        private object _Value;
+        public object Value { get { return _Value; } }
+        public ValueDefinition(ValueTypes type, object value)
+        {
+            _Type = type;
+            _Value = value;
+        }
+        public override string ToString()
+        {
+            return String.Format("{0} : {1}", _Type, _Value);
+        }
+    }
+
+    public sealed class PolicyValueInfo
+    {
+        // Registry value information.
+        private string _RegistryValueName;
+        public string RegistryValueName { get { return _RegistryValueName; } }
+        // single Enabled/Disabled value definitions.
+        private ValueDefinition _EnabledValue;
+        public ValueDefinition EnabledValue { get { return _EnabledValue; } }
+        private ValueDefinition _DisabledValue;
+        public ValueDefinition DisabledValue { get { return _DisabledValue; } }
+        [System.Management.Automation.HiddenAttribute]
+        public void set_RegistryValue(string valueName, ValueDefinition enabledValue, ValueDefinition disabledValue)
+        {
+            _RegistryValueName = valueName;
+            _EnabledValue = enabledValue;
+            _DisabledValue = disabledValue;
+        }
+        // TODO : implement ValueList, Element type definitions.
+        // list value definitions.
+        private bool _HasEnabledList;
+        public bool HasEnabledList { get { return _HasEnabledList; } }
+        private bool _HasDisabledList;
+        public bool HasDisabledList { get { return _HasDisabledList; } }
+        [System.Management.Automation.HiddenAttribute]
+        public void _set_HasList(bool enabledList, bool disabledList)
+        {
+            // ! Temporary implementation
+            _HasEnabledList = enabledList;
+            _HasDisabledList = disabledList;
+        }
+        // element value definition.
+        private bool _HasElement;
+        public bool HasElement { get { return _HasElement; } }
+        [System.Management.Automation.HiddenAttribute]
+        public void _set_HasElement(bool element)
+        {
+            // ! Temporary implementation
+            _HasElement = element;
+        }
     }
 }

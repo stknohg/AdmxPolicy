@@ -162,6 +162,74 @@ function Get-AdmxFileInfo () {
     }
 }
 
+# Private
+function GetValueDefinitionFromXmlNode ([Xml.XmlElement]$ValueElement) {
+    $type = [AdmxPolicy.ValueTypes]::Unknown
+    $value = $null
+    switch ( $ValueElement.FirstChild.Name ) {
+        "delete" {
+            $type = [AdmxPolicy.ValueTypes]::Delete
+            $value = $null
+        }
+        "decimal" {
+            $type = [AdmxPolicy.ValueTypes]::Decimal
+            $value = [decimal]$ValueElement.FirstChild.value
+        }
+        "longdecimal" {
+            $type = [AdmxPolicy.ValueTypes]::LongDecimal
+            $value = [decimal]$ValueElement.FirstChild.value
+        }
+        "string" {
+            $type = [AdmxPolicy.ValueTypes]::String
+            $value = [string]$ValueElement.FirstChild.value
+        }
+        Default {
+            $type = [AdmxPolicy.ValueTypes]::Unknown
+            $value = $ValueElement.FirstChild.value
+        }
+    }
+    return New-Object "AdmxPolicy.ValueDefinition" -ArgumentList ($type, $value)
+}
+
+# Private 
+function GetValueInfoFromXmlNode ([Xml.XmlElement]$PolicyElement) {
+    $Result = New-Object "AdmxPolicy.PolicyValueInfo"
+    # base value definitions
+    $valueName = $null
+    if ( $PolicyElement.HasAttribute("valueName") ) {
+        $valueName = $PolicyElement.valueName
+    }
+    $enabledValue = $null
+    if ( $PolicyElement.Item("enabledValue") ) {
+        $enabledValue = GetValueDefinitionFromXmlNode -ValueElement $PolicyElement.enabledValue
+    }
+    $disabledValue = $null
+    if ( $PolicyElement.Item("disabledValue") ) {
+        $disabledValue = GetValueDefinitionFromXmlNode -ValueElement $PolicyElement.disabledValue
+    }
+    $Result.set_RegistryValue($valueName, $enabledValue, $disabledValue)
+
+    # list value definitions
+    # ! Temporary implementation
+    $hasEnabledList = $false
+    if ( $PolicyElement.Item("enabledList") ) {
+        $hasEnabledList = $true
+    }
+    $hasDisabledList = $false
+    if ( $PolicyElement.Item("disabledList") ) {
+        $hasDisabledList = $true
+    }
+    $Result._set_HasList($hasEnabledList, $hasDisabledList)
+
+    # element value definition
+    # ! Temporary implementation
+    if ( $PolicyElement.Item("elements") ) {
+        $Result._set_HasElement($true)
+    }
+
+    return $Result
+}
+
 <#
 .SYNOPSIS
     Get group policy information from an ADMX file.
@@ -266,6 +334,8 @@ function Get-AdmxPolicies () {
                     $RegistryPath += "HKCU:\$($policy.key)"
                 }
             }
+            # get valueInfo
+            $valueInfo = GetValueInfoFromXmlNode -PolicyElement $policy
 
             # set return value
             $Result = New-Object "AdmxPolicy.PolicyInfo"
@@ -275,6 +345,7 @@ function Get-AdmxPolicies () {
             $Result.ExplainText = $policyExplainText
             $Result.RegistryType = $RegistryType
             $Result.RegistryPath = $RegistryPath
+            $Result.ValueInfo = $valueInfo
             Write-Output $Result
         }
     }
