@@ -97,7 +97,7 @@ namespace AdmxPolicy
         public string RegistryPath { get { return _RegistryPath; } }
         private PolicyValueInfo _ValueInfo;
         public PolicyValueInfo ValueInfo { get { return _ValueInfo; } }
-        public PolicyInfo(AdmxFileInfo fileInfo, string name, string displayName, string explainText, 
+        public PolicyInfo(AdmxFileInfo fileInfo, string name, string displayName, string explainText,
                           RegistryTypes registryType, string registryPath, PolicyValueInfo valueInfo)
         {
             _FileInfo = fileInfo;
@@ -142,7 +142,7 @@ namespace AdmxPolicy
         public List<ListItem> Items { get { return _Items; } }
         private string _DefaultRegistryPath;
         public string DefaultRegistryPath { get { return _DefaultRegistryPath; } }
-        public ValueDefinitionList() 
+        public ValueDefinitionList()
         {
             _DefaultRegistryPath = "";
         }
@@ -168,14 +168,28 @@ namespace AdmxPolicy
         }
     }
 
+    public enum ElementTypes
+    {
+        Unknown = 0,
+        Boolean,
+        Decimal,
+        LongDecimal,
+        Text,
+        MultiText,
+        Enum,
+        List
+    }
+
     public interface IValueDefinitionElement
     {
+        ElementTypes ElementType { get; }
         string Id { get; }
         string RegistryValueName { get; }
     }
 
-    public class ValueDefinitionBase : IValueDefinitionElement
+    public abstract class ValueDefinitionBase : IValueDefinitionElement
     {
+        public virtual ElementTypes ElementType { get { return ElementTypes.Unknown; } }
         private string _Id;
         public string Id { get { return _Id; } }
         private string _RegistryPath;
@@ -192,6 +206,7 @@ namespace AdmxPolicy
 
     public sealed class BooleanDefinitionElement : ValueDefinitionBase
     {
+        public override ElementTypes ElementType { get { return ElementTypes.Boolean; } }
         private ValueDefinition _TrueValue;
         public ValueDefinition TrueValue { get { return _TrueValue; } }
         private ValueDefinition _FalseValue;
@@ -210,6 +225,7 @@ namespace AdmxPolicy
 
     public sealed class DecimalDefinitionElement : ValueDefinitionBase
     {
+        public override ElementTypes ElementType { get { return ElementTypes.Decimal; } }
         private bool _Required;
         public bool Required { get { return _Required; } }
         private Decimal _MinValue;
@@ -236,6 +252,7 @@ namespace AdmxPolicy
 
     public sealed class LongDecimalDefinitionElement : ValueDefinitionBase
     {
+        public override ElementTypes ElementType { get { return ElementTypes.LongDecimal; } }
         private bool _Required;
         public bool Required { get { return _Required; } }
         private Decimal _MinValue;
@@ -262,6 +279,7 @@ namespace AdmxPolicy
 
     public sealed class TextDefinitionElement : ValueDefinitionBase
     {
+        public override ElementTypes ElementType { get { return ElementTypes.Text; } }
         private bool _Required;
         public bool Required { get { return _Required; } }
         private Decimal _MaxLength = 1023;
@@ -285,6 +303,7 @@ namespace AdmxPolicy
 
     public sealed class MultiTextDefinitionElement : ValueDefinitionBase
     {
+        public override ElementTypes ElementType { get { return ElementTypes.MultiText; } }
         private bool _Required;
         public bool Required { get { return _Required; } }
         private Decimal _MaxLength = 1023;
@@ -308,6 +327,7 @@ namespace AdmxPolicy
 
     public sealed class EnumDefinitionElement : ValueDefinitionBase
     {
+        public override ElementTypes ElementType { get { return ElementTypes.Enum; } }
         private bool _Required;
         public bool Required { get { return _Required; } }
         [System.Management.Automation.HiddenAttribute]
@@ -330,6 +350,7 @@ namespace AdmxPolicy
 
     public sealed class ListDefinitionElement : ValueDefinitionBase
     {
+        public override ElementTypes ElementType { get { return ElementTypes.List; } }
         private string _ValuePrefix;
         public string ValuePrefix { get { return _ValuePrefix; } }
         private bool _Additive;
