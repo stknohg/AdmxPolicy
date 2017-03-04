@@ -168,6 +168,198 @@ namespace AdmxPolicy
         }
     }
 
+    public interface IValueDefinitionElement
+    {
+        string Id { get; }
+        string RegistryValueName { get; }
+    }
+
+    public class ValueDefinitionBase : IValueDefinitionElement
+    {
+        private string _Id;
+        public string Id { get { return _Id; } }
+        private string _RegistryPath;
+        public string RegistryPath { get { return _RegistryPath; } }
+        private string _RegistryValueName;
+        public string RegistryValueName { get { return _RegistryValueName; } }
+        public ValueDefinitionBase(string id, string registryPath, string registryValueName)
+        {
+            _Id = id;
+            _RegistryPath = registryPath;
+            _RegistryValueName = registryValueName;
+        }
+    }
+
+    public sealed class BooleanDefinitionElement : ValueDefinitionBase
+    {
+        private ValueDefinition _TrueValue;
+        public ValueDefinition TrueValue { get { return _TrueValue; } }
+        private ValueDefinition _FalseValue;
+        public ValueDefinition FalseValue { get { return _FalseValue; } }
+        // TODO : implement trueList, falseList.(No admx files has theres elements?)
+        [System.Management.Automation.HiddenAttribute]
+        public void set_Properties(ValueDefinition trueValue, ValueDefinition falseValue)
+        {
+            _TrueValue = trueValue;
+            _FalseValue = falseValue;
+        }
+        public BooleanDefinitionElement(string id, string registryPath, string registryValueName) : base(id, registryPath, registryValueName)
+        {
+        }
+    }
+
+    public sealed class DecimalDefinitionElement : ValueDefinitionBase
+    {
+        private bool _Required;
+        public bool Required { get { return _Required; } }
+        private Decimal _MinValue;
+        public Decimal MinValue { get { return _MinValue; } }
+        private Decimal _MaxValue = 9999;
+        public Decimal MaxValue { get { return _MaxValue; } }
+        private bool _StoreAsText;
+        public bool StoreAsText { get { return _StoreAsText; } }
+        private bool _Soft;
+        public bool Soft { get { return _Soft; } }
+        [System.Management.Automation.HiddenAttribute]
+        public void set_Properties(bool required, Decimal minValue, Decimal maxValue, bool storeAsText, bool soft)
+        {
+            _Required = required;
+            _MinValue = minValue;
+            _MaxValue = maxValue;
+            _StoreAsText = storeAsText;
+            _Soft = soft;
+        }
+        public DecimalDefinitionElement(string id, string registryPath, string registryValueName) : base(id, registryPath, registryValueName)
+        {
+        }
+    }
+
+    public sealed class LongDecimalDefinitionElement : ValueDefinitionBase
+    {
+        private bool _Required;
+        public bool Required { get { return _Required; } }
+        private Decimal _MinValue;
+        public Decimal MinValue { get { return _MinValue; } }
+        private Decimal _MaxValue = 9999;
+        public Decimal MaxValue { get { return _MaxValue; } }
+        private bool _StoreAsText;
+        public bool StoreAsText { get { return _StoreAsText; } }
+        private bool _Soft;
+        public bool Soft { get { return _Soft; } }
+        [System.Management.Automation.HiddenAttribute]
+        public void set_Properties(bool required, Decimal minValue, Decimal maxValue, bool storeAsText, bool soft)
+        {
+            _Required = required;
+            _MinValue = minValue;
+            _MaxValue = maxValue;
+            _StoreAsText = storeAsText;
+            _Soft = soft;
+        }
+        public LongDecimalDefinitionElement(string id, string registryPath, string registryValueName) : base(id, registryPath, registryValueName)
+        {
+        }
+    }
+
+    public sealed class TextDefinitionElement : ValueDefinitionBase
+    {
+        private bool _Required;
+        public bool Required { get { return _Required; } }
+        private Decimal _MaxLength = 1023;
+        public Decimal MaxLength { get { return _MaxLength; } }
+        private bool _Expandable;
+        public bool Expandable { get { return _Expandable; } }
+        private bool _Soft;
+        public bool Soft { get { return _Soft; } }
+        [System.Management.Automation.HiddenAttribute]
+        public void set_Properties(bool required, Decimal maxLength, bool expandable, bool soft)
+        {
+            _Required = required;
+            _MaxLength = maxLength;
+            _Expandable = expandable;
+            _Soft = soft;
+        }
+        public TextDefinitionElement(string id, string registryPath, string registryValueName) : base(id, registryPath, registryValueName)
+        {
+        }
+    }
+
+    public sealed class MultiTextDefinitionElement : ValueDefinitionBase
+    {
+        private bool _Required;
+        public bool Required { get { return _Required; } }
+        private Decimal _MaxLength = 1023;
+        public Decimal MaxLength { get { return _MaxLength; } }
+        private Decimal _MaxStrings;
+        public Decimal MaxStrings { get { return _MaxStrings; } }
+        private bool _Soft;
+        public bool Soft { get { return _Soft; } }
+        [System.Management.Automation.HiddenAttribute]
+        public void set_Properties(bool required, Decimal maxLength, Decimal maxStrings, bool soft)
+        {
+            _Required = required;
+            _MaxLength = maxLength;
+            _MaxStrings = maxStrings;
+            _Soft = soft;
+        }
+        public MultiTextDefinitionElement(string id, string registryPath, string registryValueName) : base(id, registryPath, registryValueName)
+        {
+        }
+    }
+
+    public sealed class EnumDefinitionElement : ValueDefinitionBase
+    {
+        private bool _Required;
+        public bool Required { get { return _Required; } }
+        [System.Management.Automation.HiddenAttribute]
+        public void set_Properties(bool required)
+        {
+            _Required = required;
+        }
+        // TODO : implement when item cotains valueList.(e.g. Bits.admx)
+        private List<KeyValuePair<string, ValueDefinition>> _Enums = new List<KeyValuePair<string, ValueDefinition>>();
+        public List<KeyValuePair<string, ValueDefinition>> Enums { get { return _Enums; } }
+        [System.Management.Automation.HiddenAttribute]
+        public void add_EnumsItem(string displayName, ValueDefinition value)
+        {
+            _Enums.Add(new KeyValuePair<string, ValueDefinition>(displayName, value));
+        }
+        public EnumDefinitionElement(string id, string registryPath, string registryValueName) : base(id, registryPath, registryValueName)
+        {
+        }
+    }
+
+    public sealed class ListDefinitionElement : ValueDefinitionBase
+    {
+        private string _ValuePrefix;
+        public string ValuePrefix { get { return _ValuePrefix; } }
+        private bool _Additive;
+        public bool Additive { get { return _Additive; } }
+        private bool _Expandable;
+        public bool Expandable { get { return _Expandable; } }
+        private bool _ExplicitValue;
+        public bool ExplicitValue { get { return _ExplicitValue; } }
+        private string _ClientExtension;
+        public string ClientExtension { get { return _ClientExtension; } }
+        [System.Management.Automation.HiddenAttribute]
+        public void set_Properties(string valuePrefix, bool additive, bool expandable, bool explicitValue, string clientExtension)
+        {
+            _ValuePrefix = valuePrefix;
+            _Additive = additive;
+            _Expandable = expandable;
+            _ExplicitValue = explicitValue;
+            _ClientExtension = clientExtension;
+        }
+        public ListDefinitionElement(string id, string registryPath, string registryValueName) : base(id, registryPath, registryValueName)
+        {
+        }
+    }
+
+    public sealed class ValueDefinitionElements
+    {
+        private List<IValueDefinitionElement> _Items = new List<IValueDefinitionElement>();
+        public List<IValueDefinitionElement> Items { get { return _Items; } }
+    }
+
     public sealed class PolicyValueInfo
     {
         // Registry value information.
@@ -202,15 +394,14 @@ namespace AdmxPolicy
         {
             _DisabledList = list;
         }
-        // TODO : implement ValueList, Element type definitions.
         // element value definition.
-        private bool _HasElement;
-        public bool HasElement { get { return _HasElement; } }
+        private ValueDefinitionElements _Elements;
+        public ValueDefinitionElements Elements { get { return _Elements; } }
+        public bool HasElements { get { return (_Elements != null && _Elements.Items.Count > 0); } }
         [System.Management.Automation.HiddenAttribute]
-        public void _set_HasElement(bool element)
+        public void set_ElementsValue(ValueDefinitionElements elements)
         {
-            // ! Temporary implementation
-            _HasElement = element;
+            _Elements = elements;
         }
     }
 }

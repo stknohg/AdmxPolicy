@@ -186,14 +186,114 @@ function GetValueDefinitionFromXmlNode ([Xml.XmlElement]$ValueElement) {
     return New-Object "AdmxPolicy.ValueDefinition" -ArgumentList ($type, $value)
 }
 
-# Private 
-function GetValueInfoFromXmlNode ([Xml.XmlElement]$PolicyElement) {
-    $Result = New-Object "AdmxPolicy.PolicyValueInfo"
-    # base value definitions
-    $valueName = $null
-    if ( $PolicyElement.HasAttribute("valueName") ) {
-        $valueName = $PolicyElement.valueName
+# Private
+function TryGetAttribute ([Xml.XmlElement]$Element, [string]$AttributeName, [object]$Default) {
+    if ( $Element.HasAttribute($AttributeName) ) {
+        return $Element.$AttributeName
     }
+    return $Default
+}
+
+# Private
+function GetElementsInfoFromXmlNode ([Xml.XmlElement]$Elements, [AdmxPolicy.AdmlResource]$AdmlResource) {
+    $Result = New-Object "AdmxPolicy.ValueDefinitionElements"
+    foreach ( $element in $Elements.ChildNodes ) {
+        if ( $element.NodeType -ne "Element" ) {
+            # skip comment, text etc.
+            continue
+        }
+        $item = $null
+        $id = $element.id
+        $registryPath = TryGetAttribute $element "key" ""
+        $registryValueName = TryGetAttribute $element "valueName" ""
+        switch ( $element.name ) {
+            "boolean" { 
+                $item = New-Object "AdmxPolicy.BooleanDefinitionElement" -ArgumentList ($id, $registryPath, $registryValueName)
+                $trueValue = $null
+                if ( $element.Item("trueValue") ) {
+                    $trueValue = GetValueDefinitionFromXmlNode -ValueElement $element.trueValue
+                }
+                $falseValue = $null
+                if ( $element.Item("falseValue") ) {
+                    $falseValue = GetValueDefinitionFromXmlNode -ValueElement $element.falseValue
+                }
+                # TODO : implement trueList, falseList.(No admx files has theres elements?)
+                $item.set_Properties($trueValue, $falseValue)
+            }
+            "decimal" { 
+                $item = New-Object "AdmxPolicy.DecimalDefinitionElement" -ArgumentList ($id, $registryPath, $registryValueName)
+                $required = TryGetAttribute $element "required" $false
+                $minValue = TryGetAttribute $element "minValue" 0
+                $maxValue = TryGetAttribute $element "maxValue" 9999
+                $storeAsText = TryGetAttribute $element "storeAsText" $false
+                $soft = TryGetAttribute $element "soft" $false
+                $item.set_Properties($required, $minValue, $maxValue, $storeAsText, $soft)
+            }
+            "longdecimal" { 
+                $item = New-Object "AdmxPolicy.LongDecimalDefinitionElement" -ArgumentList ($id, $registryPath, $registryValueName)
+                $required = TryGetAttribute $element "required" $false
+                $minValue = TryGetAttribute $element "minValue" 0
+                $maxValue = TryGetAttribute $element "maxValue" 9999
+                $storeAsText = TryGetAttribute $element "storeAsText" $false
+                $soft = TryGetAttribute $element "soft" $false
+                $item.set_Properties($required, $minValue, $maxValue, $storeAsText, $soft)
+            }
+            "text" { 
+                $item = New-Object "AdmxPolicy.TextDefinitionElement" -ArgumentList ($id, $registryPath, $registryValueName)
+                $required = TryGetAttribute $element "required" $false
+                $maxLength = TryGetAttribute $element "maxLength" 1023
+                $soft = TryGetAttribute $element "soft" $false
+                $expandable = TryGetAttribute $element "expandable" $false
+                $item.set_Properties($required, $maxLength, $soft, $expandable)
+            }
+            "multitext" {
+                $item = New-Object "AdmxPolicy.MultiTextDefinitionElement" -ArgumentList ($id, $registryPath, $registryValueName)
+                $required = TryGetAttribute $element "required" $false
+                $maxLength = TryGetAttribute $element "maxLength" 1023
+                $maxStrings = TryGetAttribute $element "maxStrings" 0
+                $soft = TryGetAttribute $element "soft" $false
+                $item.set_Properties($required, $maxLength, $maxStrings, $soft)
+            }
+            "enum" { 
+                $item = New-Object "AdmxPolicy.EnumDefinitionElement" -ArgumentList ($id, $registryPath, $registryValueName)
+                $required = TryGetAttribute $element "required" $false
+                $item.set_Properties($required)
+                # TODO : implement when item cotains valueList.(e.g. Bits.admx)
+                foreach ($i in $element.item) {
+                    $enumKey = $i.displayName
+                    if ( $admlResource.Strings.ContainsKey($enumKey) ) {
+                        $enumKey = $admlResource.Strings[$enumKey]
+                    }
+                    $enumValue = GetValueDefinitionFromXmlNode -ValueElement $i.value
+                    $item.add_EnumsItem($enumKey, $enumValue)
+                }
+            }
+            "list" { 
+                $item = New-Object "AdmxPolicy.ListDefinitionElement" -ArgumentList ($id, $registryPath, $registryValueName)
+                $prefix = TryGetAttribute $element "valuePrefix" ""
+                $additive = TryGetAttribute $element "additive" $false
+                $expandable = TryGetAttribute $element "expandable" $false
+                $explicitValue = TryGetAttribute $element "explicitValue" $false
+                $clientExtension = TryGetAttribute $element "clientExtension" ""
+                $item.set_Properties($prefix, $additive, $expandable, $explicitValue, $clientExtension)
+            }
+            Default {
+                # unknown type. do nothing.
+            }
+        }
+        if ( $null -ne $item ) {
+            $Result.Items.Add($item)
+        }
+    }
+    return $Result
+}
+
+# Private 
+function GetValueInfoFromXmlNode ([Xml.XmlElement]$PolicyElement, [AdmxPolicy.AdmlResource]$AdmlResource) {
+    $Result = New-Object "AdmxPolicy.PolicyValueInfo"
+
+    # base value definitions
+    $valueName = TryGetAttribute $PolicyElement "valueName" ""
     $enabledValue = $null
     if ( $PolicyElement.Item("enabledValue") ) {
         $enabledValue = GetValueDefinitionFromXmlNode -ValueElement $PolicyElement.enabledValue
@@ -207,10 +307,7 @@ function GetValueInfoFromXmlNode ([Xml.XmlElement]$PolicyElement) {
     # list value definitions
     if ( $PolicyElement.Item("enabledList") ) {
         Write-Verbose "Get enabledList information..."
-        $defaultKey = ""
-        if ( $PolicyElement.enabledList.HasAttribute("defaultKey") ) {
-            $defaultKey = $PolicyElement.enabledList.defaultKey
-        }
+        $defaultKey = TryGetAttribute $PolicyElement.enabledList "defaultKey" ""
         $list = New-Object "AdmxPolicy.ValueDefinitionList" -ArgumentList $defaultKey
         foreach ( $i in $PolicyElement.enabledList.item ) {
             $args = @(
@@ -224,10 +321,7 @@ function GetValueInfoFromXmlNode ([Xml.XmlElement]$PolicyElement) {
     }
     if ( $PolicyElement.Item("disabledList") ) {
         Write-Verbose "Get disabledList information..."
-        $defaultKey = ""
-        if ( $PolicyElement.disabledList.HasAttribute("defaultKey") ) {
-            $defaultKey = $PolicyElement.disabledList.defaultKey
-        }
+        $defaultKey = TryGetAttribute $PolicyElement.disabledList "defaultKey" ""
         $list = New-Object "AdmxPolicy.ValueDefinitionList" -ArgumentList $defaultKey
         foreach ( $i in $PolicyElement.disabledList.item ) {
             $args = @(
@@ -241,9 +335,8 @@ function GetValueInfoFromXmlNode ([Xml.XmlElement]$PolicyElement) {
     }
 
     # element value definition
-    # ! Temporary implementation
     if ( $PolicyElement.Item("elements") ) {
-        $Result._set_HasElement($true)
+        $Result.set_ElementsValue((GetElementsInfoFromXmlNode -Elements $PolicyElement.elements -AdmlResource $AdmlResource))
     }
 
     return $Result
@@ -350,7 +443,7 @@ function Get-AdmxPolicies () {
             }
             $RegistryPath = $policy.key
             # get valueInfo
-            $valueInfo = GetValueInfoFromXmlNode -PolicyElement $policy
+            $valueInfo = GetValueInfoFromXmlNode -PolicyElement $policy -AdmlResource $admlResource
 
             # set return value
             $Result = New-Object "AdmxPolicy.PolicyInfo" `
