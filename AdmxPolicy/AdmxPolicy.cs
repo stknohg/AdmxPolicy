@@ -14,25 +14,41 @@ namespace AdmxPolicy
     public sealed class AdmlResource
     {
         private string _DisplayName;
-        public string DisplayName { get { return _DisplayName; } set { _DisplayName = value; } }
+        public string DisplayName { get { return _DisplayName; } }
         private string _Description;
-        public string Description { get { return _Description; } set { _Description = value; } }
+        public string Description { get { return _Description; } }
         private Dictionary<string, string> _Strings = new Dictionary<string, string>();
         public Dictionary<string, string> Strings { get { return _Strings; } }
         private Dictionary<string, string> _Windows = new Dictionary<string, string>();
         public Dictionary<string, string> Windows { get { return _Windows; } }
+        public AdmlResource()
+        {
+            _DisplayName = "";
+            _Description = "";
+        }
+        public AdmlResource(string displayName, string description)
+        {
+            _DisplayName = displayName;
+            _Description = description;
+        }
     }
 
     public sealed class AdmxFileInfo
     {
         private string _Name;
-        public string Name { get { return _Name; } set { _Name = value; } }
+        public string Name { get { return _Name; } }
         private string _DisplayName;
-        public string DisplayName { get { return _DisplayName; } set { _DisplayName = value; } }
+        public string DisplayName { get { return _DisplayName; } }
         private string _Description;
-        public string Description { get { return _Description; } set { _Description = value; } }
+        public string Description { get { return _Description; } }
         private List<CategoryInfo> _Categories = new List<CategoryInfo>();
         public List<CategoryInfo> Categories { get { return _Categories; } }
+        public AdmxFileInfo(string name, string displayName, string description)
+        {
+            _Name = name;
+            _DisplayName = displayName;
+            _Description = description;
+        }
         public override string ToString()
         {
             return _Name;
@@ -42,23 +58,28 @@ namespace AdmxPolicy
     public sealed class CategoryInfo
     {
         private string _Name;
-        public string Name { get { return _Name; } set { _Name = value; } }
+        public string Name { get { return _Name; } }
         private string _DisplayName;
-        public string DisplayName { get { return _DisplayName; } set { _DisplayName = value; } }
+        public string DisplayName { get { return _DisplayName; } }
+        public CategoryInfo(string name, string displayName)
+        {
+            _Name = name;
+            _DisplayName = displayName;
+        }
     }
 
     public sealed class PolicyInfo
     {
         private AdmxFileInfo _FileInfo;
-        public AdmxFileInfo FileInfo { get { return _FileInfo; } set { _FileInfo = value; } }
+        public AdmxFileInfo FileInfo { get { return _FileInfo; } }
         private string _Name;
-        public string Name { get { return _Name; } set { _Name = value; } }
+        public string Name { get { return _Name; } }
         private string _DisplayName;
-        public string DisplayName { get { return _DisplayName; } set { _DisplayName = value; } }
+        public string DisplayName { get { return _DisplayName; } }
         private string _ExplainText;
-        public string ExplainText { get { return _ExplainText; } set { _ExplainText = value; } }
+        public string ExplainText { get { return _ExplainText; } }
         private RegistryTypes _RegistryType;
-        public RegistryTypes RegistryType { get { return _RegistryType; } set { _RegistryType = value; } }
+        public RegistryTypes RegistryType { get { return _RegistryType; } }
         public string[] RegistryDrives
         {
             get
@@ -73,9 +94,20 @@ namespace AdmxPolicy
             }
         }
         private string _RegistryPath;
-        public string RegistryPath { get { return _RegistryPath; } set { _RegistryPath = value; } }
+        public string RegistryPath { get { return _RegistryPath; } }
         private PolicyValueInfo _ValueInfo;
-        public PolicyValueInfo ValueInfo { get { return _ValueInfo; } set { _ValueInfo = value; } }
+        public PolicyValueInfo ValueInfo { get { return _ValueInfo; } }
+        public PolicyInfo(AdmxFileInfo fileInfo, string name, string displayName, string explainText, 
+                          RegistryTypes registryType, string registryPath, PolicyValueInfo valueInfo)
+        {
+            _FileInfo = fileInfo;
+            _Name = name;
+            _DisplayName = displayName;
+            _ExplainText = explainText;
+            _RegistryType = registryType;
+            _RegistryPath = registryPath;
+            _ValueInfo = valueInfo;
+        }
     }
 
     public enum ValueTypes

@@ -43,10 +43,8 @@ function Get-AdmlResource() {
             return
         }
         
-        $Result = New-Object "AdmxPolicy.AdmlResource"
         # displayname / description
-        $Result.DisplayName = $xml.policyDefinitionResources.displayName
-        $Result.Description = $xml.policyDefinitionResources.description
+        $Result = New-Object "AdmxPolicy.AdmlResource" -ArgumentList ($xml.policyDefinitionResources.displayName, $xml.policyDefinitionResources.description)
         # stringResource
         $strings = $xml.policyDefinitionResources.resources.stringTable.string
         foreach ( $string in $strings ) {
@@ -79,18 +77,15 @@ function Get-AdmlResource() {
 
 # Private
 function GetAdmxFileInfoFromXml ([string]$Name,  [xml]$Xml, [AdmxPolicy.AdmlResource]$AdmlResource) {
-    $Result = New-Object "AdmxPolicy.AdmxFileInfo"
-    $Result.Name = $Name
-    $Result.DisplayName = $AdmlResource.DisplayName
-    $Result.Description = $AdmlResource.Description
+    $Result = New-Object "AdmxPolicy.AdmxFileInfo" -ArgumentList ($Name, $AdmlResource.DisplayName, $AdmlResource.Description)
     try {
         $categories = $xml.policyDefinitions.categories.category
         foreach ($category in $categories) {
-            $item = New-Object "AdmxPolicy.CategoryInfo"
-            $item.Name = $category.name
+            $displayName = "" 
             if ( $AdmlResource.Strings.ContainsKey($category.displayName) ) {
-                $item.DisplayName = $AdmlResource.Strings[$category.displayName]
+                $displayName = $AdmlResource.Strings[$category.displayName]
             }
+            $item = New-Object "AdmxPolicy.CategoryInfo" -ArgumentList ($category.name, $displayName)
             $Result.Categories.Add($item)
         }
     } catch {
@@ -358,14 +353,8 @@ function Get-AdmxPolicies () {
             $valueInfo = GetValueInfoFromXmlNode -PolicyElement $policy
 
             # set return value
-            $Result = New-Object "AdmxPolicy.PolicyInfo"
-            $Result.FileInfo = $fileInfo
-            $Result.Name = $policy.name
-            $Result.DisplayName = $policyDisplayName
-            $Result.ExplainText = $policyExplainText
-            $Result.RegistryType = $RegistryType
-            $Result.RegistryPath = $RegistryPath
-            $Result.ValueInfo = $valueInfo
+            $Result = New-Object "AdmxPolicy.PolicyInfo" `
+                -ArgumentList ($fileInfo, $policy.name, $policyDisplayName, $policyExplainText, $RegistryType, $RegistryPath, $valueInfo)
             Write-Output $Result
         }
     }
