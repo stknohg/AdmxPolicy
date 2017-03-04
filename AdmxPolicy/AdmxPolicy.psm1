@@ -310,12 +310,8 @@ function GetValueInfoFromXmlNode ([Xml.XmlElement]$PolicyElement, [AdmxPolicy.Ad
         $defaultKey = TryGetAttribute $PolicyElement.enabledList "defaultKey" ""
         $list = New-Object "AdmxPolicy.ValueDefinitionList" -ArgumentList $defaultKey
         foreach ( $i in $PolicyElement.enabledList.item ) {
-            $args = @(
-                $i.key,
-                $i.valueName,
-                (GetValueDefinitionFromXmlNode -ValueElement $i.value)
-            )
-            $list.Items.Add((New-Object "AdmxPolicy.ListItem" -ArgumentList $args))
+            $list.Items.Add((New-Object "AdmxPolicy.ListItem" `
+                    -ArgumentList ($i.key, $i.valueName, (GetValueDefinitionFromXmlNode -ValueElement $i.value))))
         }
         $Result.set_EnabledListValue($list)
     }
@@ -324,12 +320,8 @@ function GetValueInfoFromXmlNode ([Xml.XmlElement]$PolicyElement, [AdmxPolicy.Ad
         $defaultKey = TryGetAttribute $PolicyElement.disabledList "defaultKey" ""
         $list = New-Object "AdmxPolicy.ValueDefinitionList" -ArgumentList $defaultKey
         foreach ( $i in $PolicyElement.disabledList.item ) {
-            $args = @(
-                $i.key,
-                $i.valueName,
-                (GetValueDefinitionFromXmlNode -ValueElement $i.value)
-            )
-            $list.Items.Add((New-Object "AdmxPolicy.ListItem" -ArgumentList $args))
+            $list.Items.Add((New-Object "AdmxPolicy.ListItem" `
+                                -ArgumentList ($i.key, $i.valueName, (GetValueDefinitionFromXmlNode -ValueElement $i.value))))
         }
         $Result.set_DisabledListValue($list)
     }
