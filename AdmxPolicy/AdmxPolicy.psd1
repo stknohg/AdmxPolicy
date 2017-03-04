@@ -3,8 +3,8 @@
 #
 @{
     GUID = 'b05e2e20-3743-443a-b977-5e0b93b418b4'
-    ModuleVersion = '0.3'
-    Description = 'Get group policy information from ADMX files.(Beta)'
+    ModuleVersion = '0.4'
+    Description = 'Get Group Policy information from ADMX files.'
 
     Author = 'stknohg'
     CompanyName = 'stknohg'
