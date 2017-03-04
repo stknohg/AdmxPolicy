@@ -210,16 +210,40 @@ function GetValueInfoFromXmlNode ([Xml.XmlElement]$PolicyElement) {
     $Result.set_RegistryValue($valueName, $enabledValue, $disabledValue)
 
     # list value definitions
-    # ! Temporary implementation
-    $hasEnabledList = $false
     if ( $PolicyElement.Item("enabledList") ) {
-        $hasEnabledList = $true
+        Write-Verbose "Get enabledList information..."
+        $defaultKey = ""
+        if ( $PolicyElement.enabledList.HasAttribute("defaultKey") ) {
+            $defaultKey = $PolicyElement.enabledList.defaultKey
+        }
+        $list = New-Object "AdmxPolicy.ValueDefinitionList" -ArgumentList $defaultKey
+        foreach ( $i in $PolicyElement.enabledList.item ) {
+            $args = @(
+                $i.key,
+                $i.valueName,
+                (GetValueDefinitionFromXmlNode -ValueElement $i.value)
+            )
+            $list.Items.Add((New-Object "AdmxPolicy.ListItem" -ArgumentList $args))
+        }
+        $Result.set_EnabledListValue($list)
     }
-    $hasDisabledList = $false
     if ( $PolicyElement.Item("disabledList") ) {
-        $hasDisabledList = $true
+        Write-Verbose "Get disabledList information..."
+        $defaultKey = ""
+        if ( $PolicyElement.disabledList.HasAttribute("defaultKey") ) {
+            $defaultKey = $PolicyElement.disabledList.defaultKey
+        }
+        $list = New-Object "AdmxPolicy.ValueDefinitionList" -ArgumentList $defaultKey
+        foreach ( $i in $PolicyElement.disabledList.item ) {
+            $args = @(
+                $i.key,
+                $i.valueName,
+                (GetValueDefinitionFromXmlNode -ValueElement $i.value)
+            )
+            $list.Items.Add((New-Object "AdmxPolicy.ListItem" -ArgumentList $args))
+        }
+        $Result.set_DisabledListValue($list)
     }
-    $Result._set_HasList($hasEnabledList, $hasDisabledList)
 
     # element value definition
     # ! Temporary implementation
@@ -318,22 +342,18 @@ function Get-AdmxPolicies () {
             }
             # get registry key
             $RegistryType = [AdmxPolicy.RegistryTypes]::Unknown
-            $RegistryPath = @()
             switch ($policy.class) {
                 "Machine" {
                     $RegistryType = [AdmxPolicy.RegistryTypes]::LocalMachine
-                    $RegistryPath += "HKLM:\$($policy.key)"
                 }
                 "User" {
                     $RegistryType = [AdmxPolicy.RegistryTypes]::CurrentUser
-                    $RegistryPath += "HKCU:\$($policy.key)"
                 }
                 "Both" {
                     $RegistryType = [AdmxPolicy.RegistryTypes]::Both
-                    $RegistryPath += "HKLM:\$($policy.key)"
-                    $RegistryPath += "HKCU:\$($policy.key)"
                 }
             }
+            $RegistryPath = $policy.key
             # get valueInfo
             $valueInfo = GetValueInfoFromXmlNode -PolicyElement $policy
 

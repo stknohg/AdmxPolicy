@@ -33,6 +33,10 @@ namespace AdmxPolicy
         public string Description { get { return _Description; } set { _Description = value; } }
         private List<CategoryInfo> _Categories = new List<CategoryInfo>();
         public List<CategoryInfo> Categories { get { return _Categories; } }
+        public override string ToString()
+        {
+            return _Name;
+        }
     }
 
     public sealed class CategoryInfo
@@ -55,8 +59,21 @@ namespace AdmxPolicy
         public string ExplainText { get { return _ExplainText; } set { _ExplainText = value; } }
         private RegistryTypes _RegistryType;
         public RegistryTypes RegistryType { get { return _RegistryType; } set { _RegistryType = value; } }
-        private string[] _RegistryPath;
-        public string[] RegistryPath { get { return _RegistryPath; } set { _RegistryPath = value; } }
+        public string[] RegistryDrives
+        {
+            get
+            {
+                switch (_RegistryType)
+                {
+                    case RegistryTypes.LocalMachine: { return new string[] { "HKLM:" }; }
+                    case RegistryTypes.CurrentUser: { return new string[] { "HKCU:" }; }
+                    case RegistryTypes.Both: { return new string[] { "HKLM:", "HKCU:" }; }
+                    default: { return new string[] { "" }; }
+                }
+            }
+        }
+        private string _RegistryPath;
+        public string RegistryPath { get { return _RegistryPath; } set { _RegistryPath = value; } }
         private PolicyValueInfo _ValueInfo;
         public PolicyValueInfo ValueInfo { get { return _ValueInfo; } set { _ValueInfo = value; } }
     }
@@ -87,6 +104,38 @@ namespace AdmxPolicy
         }
     }
 
+    public sealed class ValueDefinitionList
+    {
+        private List<ListItem> _Items = new List<ListItem>();
+        public List<ListItem> Items { get { return _Items; } }
+        private string _DefaultRegistryPath;
+        public string DefaultRegistryPath { get { return _DefaultRegistryPath; } }
+        public ValueDefinitionList() 
+        {
+            _DefaultRegistryPath = "";
+        }
+        public ValueDefinitionList(string defaultRegistryPath)
+        {
+            _DefaultRegistryPath = defaultRegistryPath;
+        }
+    }
+
+    public sealed class ListItem
+    {
+        private string _RegistryPath;
+        public string RegistryPath { get { return _RegistryPath; } }
+        private string _RegistryValueName;
+        public string RegistryValueName { get { return _RegistryValueName; } }
+        private ValueDefinition _Value;
+        public ValueDefinition Value { get { return _Value; } }
+        public ListItem(string registryPath, string registryValueName, ValueDefinition value)
+        {
+            _RegistryPath = registryPath;
+            _RegistryValueName = registryValueName;
+            _Value = value;
+        }
+    }
+
     public sealed class PolicyValueInfo
     {
         // Registry value information.
@@ -104,19 +153,24 @@ namespace AdmxPolicy
             _EnabledValue = enabledValue;
             _DisabledValue = disabledValue;
         }
-        // TODO : implement ValueList, Element type definitions.
         // list value definitions.
-        private bool _HasEnabledList;
-        public bool HasEnabledList { get { return _HasEnabledList; } }
-        private bool _HasDisabledList;
-        public bool HasDisabledList { get { return _HasDisabledList; } }
+        private ValueDefinitionList _EnabledList;
+        public ValueDefinitionList EnabledList { get { return _EnabledList; } }
+        public bool HasEnabledList { get { return (_EnabledList != null && _EnabledList.Items.Count > 0); } }
+        private ValueDefinitionList _DisabledList;
+        public ValueDefinitionList DisabledList { get { return _DisabledList; } }
+        public bool HasDisabledList { get { return (_DisabledList != null && _DisabledList.Items.Count > 0); } }
         [System.Management.Automation.HiddenAttribute]
-        public void _set_HasList(bool enabledList, bool disabledList)
+        public void set_EnabledListValue(ValueDefinitionList list)
         {
-            // ! Temporary implementation
-            _HasEnabledList = enabledList;
-            _HasDisabledList = disabledList;
+            _EnabledList = list;
         }
+        [System.Management.Automation.HiddenAttribute]
+        public void set_DisabledListValue(ValueDefinitionList list)
+        {
+            _DisabledList = list;
+        }
+        // TODO : implement ValueList, Element type definitions.
         // element value definition.
         private bool _HasElement;
         public bool HasElement { get { return _HasElement; } }

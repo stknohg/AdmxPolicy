@@ -51,10 +51,12 @@ Pester\Describe "Get-AdmxPolicies" {
         $policy | Should Not BeNullOrEmpty
         $policy.DisplayName | Should Be "ActiveX コントロールの承認されたインストール サイト"
         $policy.RegistryType | Should Be LocalMachine
-        $policy.RegistryPath.Count | Should Be 1
-        $policy.RegistryPath[0] | Should Be "HKLM:\SOFTWARE\Policies\Microsoft\Windows\AxInstaller"
+        $policy.RegistryDrives.Count | Should Be 1
+        $policy.RegistryDrives[0] | Should Be "HKLM:"
+        $policy.RegistryPath | Should Be "SOFTWARE\Policies\Microsoft\Windows\AxInstaller"
     }
-    It "if a policy don't have EnabledValue/DisabledValue, each property value is null." {
+    # tests for a single value
+    It "if a policy doesn't have EnabledValue/DisabledValue, each property value is null." {
         $policy = Get-AdmxPolicies -FilePath ".\admx\ActiveXInstallService.admx" -CultureName "ja-JP" `
                     | Where-Object { $_.Name -eq "AxISURLZonePolicies"}
         $policy.ValueInfo | Should Not BeNullOrEmpty
@@ -62,7 +64,7 @@ Pester\Describe "Get-AdmxPolicies" {
         $policy.ValueInfo.EnabledValue | Should BeNullOrEmpty
         $policy.ValueInfo.DisabledValue | Should BeNullOrEmpty
     }
-    It "get correct RegistryValueName/EnabledValue/DisabledValue" {
+    It "get correct RegistryValueName/EnabledValue/DisabledValue." {
         $policy = Get-AdmxPolicies -FilePath ".\admx\ActiveXInstallService.admx" -CultureName "ja-JP" `
                     | Where-Object { $_.Name -eq "ApprovedActiveXInstallSites"}
         $policy.ValueInfo | Should Not BeNullOrEmpty
@@ -71,5 +73,30 @@ Pester\Describe "Get-AdmxPolicies" {
         $policy.ValueInfo.EnabledValue.Value | Should Be 1
         $policy.ValueInfo.DisabledValue.Type | Should Be Decimal
         $policy.ValueInfo.DisabledValue.Value | Should Be 0
+    }
+    # test for list values.
+    It "if a policy doesn't have EnabledList/DisabledList, each property value is null." {
+        $policy = Get-AdmxPolicies -FilePath ".\admx\ActiveXInstallService.admx" -CultureName "ja-JP" `
+                    | Where-Object { $_.Name -eq "ApprovedActiveXInstallSites"}
+        $policy.ValueInfo | Should Not BeNullOrEmpty
+        $policy.ValueInfo.HasEnabledList | Should Be $false
+        $policy.ValueInfo.EnabledList | Should BeNullOrEmpty
+        $policy.ValueInfo.HasDisabledList | Should Be $false
+        $policy.ValueInfo.DisabledList | Should BeNullOrEmpty
+    }
+    It "get correct EnabledList/DisabledList value." {
+        $policy = Get-AdmxPolicies -FilePath ".\admx\DiskDiagnostic.admx" -CultureName "ja-JP" `
+                    | Where-Object { $_.Name -eq "WdiScenarioExecutionPolicy"}
+        $policy.ValueInfo | Should Not BeNullOrEmpty
+        $policy.ValueInfo.HasEnabledList | Should Be $true
+        $policy.ValueInfo.EnabledList.Items.Count | Should Be 2
+        $policy.ValueInfo.EnabledList.Items[1].RegistryPath | Should Be "SOFTWARE\Policies\Microsoft\Windows\WDI\{29689E29-2CE9-4751-B4FC-8EFF5066E3FD}"
+        $policy.ValueInfo.EnabledList.Items[1].RegistryValueName | Should Be "EnabledScenarioExecutionLevel"
+        $policy.ValueInfo.EnabledList.Items[1].Value.Value | Should Be 2
+        $policy.ValueInfo.HasDisabledList | Should Be $true
+        $policy.ValueInfo.DisabledList.Items.Count | Should Be 2
+        $policy.ValueInfo.DisabledList.Items[1].RegistryPath | Should Be "SOFTWARE\Policies\Microsoft\Windows\WDI\{29689E29-2CE9-4751-B4FC-8EFF5066E3FD}"
+        $policy.ValueInfo.DisabledList.Items[1].RegistryValueName | Should Be "EnabledScenarioExecutionLevel"
+        $policy.ValueInfo.DisabledList.Items[1].Value.Value | Should Be 1
     }
 }

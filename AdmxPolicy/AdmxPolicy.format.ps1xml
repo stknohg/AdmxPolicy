@@ -59,6 +59,9 @@
                                 <PropertyName>RegistryType</PropertyName>
                             </ListItem>
                             <ListItem>
+                                <PropertyName>RegistryDrives</PropertyName>
+                            </ListItem>
+                            <ListItem>
                                 <PropertyName>RegistryPath</PropertyName>
                             </ListItem>
                             <ListItem>
