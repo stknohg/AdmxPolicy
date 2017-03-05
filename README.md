@@ -1,7 +1,6 @@
 # AdmxPolicy
 
-Get group policy information from ADMX files.  
-(Beta version.) 
+Get Group Policy information from ADMX files.  
 
 ## How to Install
 
@@ -21,7 +20,7 @@ Get ADMX file meta information.
 Get-AdmxFileInfo -FilePath [ADMX file path]
 ```
 
-e.g.)
+e.g.
 
 ```ps1
 PS C:\> Get-AdmxFileInfo -FilePath "C:\Windows\PolicyDefinitions\ActiveXInstallService.admx" | Format-List
@@ -41,7 +40,7 @@ Get group policy information from an ADMX file.
 Get-AdmxPolicies -FilePath [ADMX file path]
 ```
 
-e.g.)
+e.g.
 
 ```ps1
 PS C:\> Get-AdmxPolicies -FilePath "C:\Windows\PolicyDefinitions\ActiveXInstallService.admx" | Select-Object -First 1 | Format-List
@@ -63,7 +62,38 @@ ExplainText    : このポリシー設定では、組織の標準ユーザーが
 RegistryType   : LocalMachine
 RegistryDrives : {HKLM:}
 RegistryPath   : SOFTWARE\Policies\Microsoft\Windows\AxInstaller
+ValueInfo      : AdmxPolicy.PolicyValueInfo
 FileName       : ActiveXInstallService.admx
+```
+
+Get group policy registry values.  
+
+e.g.
+
+```ps1
+PS C:\> $policy = Get-AdmxPolicies -FilePath "C:\Windows\PolicyDefinitions\ActiveXInstallService.admx" | Select-Object -First 1
+PS C:\> $policy.Name
+ApprovedActiveXInstallSites
+PS C:\> $policy.DisplayName
+ActiveX コントロールの承認されたインストール サイト
+PS C:\> $policy.RegistryType
+LocalMachine
+PS C:\> $policy.RegistryDrives
+HKLM:
+PS C:\> $policy.RegistryPath
+SOFTWARE\Policies\Microsoft\Windows\AxInstaller
+PS C:\> $policy.ValueInfo
+
+RegistryValueName EnabledValue DisabledValue HasEnabledList HasDisabledList HasElements
+----------------- ------------ ------------- -------------- --------------- -----------
+ApprovedList      Decimal : 1  Decimal : 0   False          False           True
+
+
+PS C:\> $policy.ValueInfo.Elements.Items
+
+ElementType Id                              RegistryPath                                                                RegistryValueName
+----------- --                              ------------                                                                -----------------
+List        ApprovedActiveXInstallSiteslist SOFTWARE\Policies\Microsoft\Windows\AxInstaller\ApprovedActiveXInstallSites
 ```
 
 ## License
