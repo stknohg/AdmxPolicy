@@ -72,6 +72,7 @@ namespace AdmxPolicy
     {
         private AdmxFileInfo _FileInfo;
         public AdmxFileInfo FileInfo { get { return _FileInfo; } }
+        public string FileName { get { return _FileInfo == null ? "" : _FileInfo.Name; } }
         private string _Name;
         public string Name { get { return _Name; } }
         private string _DisplayName;

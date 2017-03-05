@@ -29,7 +29,7 @@
                                 <PropertyName>DisplayName</PropertyName>
                             </TableColumnItem>
                             <TableColumnItem>
-                                <ScriptBlock>$_.FileInfo.Name</ScriptBlock>
+                                <PropertyName>FileName</PropertyName>
                             </TableColumnItem>
                         </TableColumnItems>
                     </TableRowEntry>
@@ -68,8 +68,7 @@
                                 <PropertyName>ValueInfo</PropertyName>
                             </ListItem>
                             <ListItem>
-                                <Label>FileName</Label>
-                                <ScriptBlock>$_.FileInfo.Name</ScriptBlock>
+                                <PropertyName>FileName</PropertyName>
                             </ListItem>
                         </ListItems>
                     </ListEntry>

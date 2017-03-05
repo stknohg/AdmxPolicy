@@ -49,6 +49,7 @@ Describe "Get-AdmxPolicies" {
         $policy = Get-AdmxPolicies -FilePath ".\admx\ActiveXInstallService.admx" -CultureName "ja-JP" `
                     | Where-Object { $_.Name -eq "ApprovedActiveXInstallSites"}
         $policy | Should Not BeNullOrEmpty
+        $policy.FileName | Should Be "ActiveXInstallService.admx"
         $policy.DisplayName | Should Be "ActiveX コントロールの承認されたインストール サイト"
         $policy.RegistryType | Should Be LocalMachine
         $policy.RegistryDrives.Count | Should Be 1
