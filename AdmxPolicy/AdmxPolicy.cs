@@ -187,7 +187,7 @@ namespace AdmxPolicy
         string RegistryValueName { get; }
     }
 
-    public abstract class ValueDefinitionBase : IValueDefinitionElement
+    public abstract class ValueDefinitionElementBase : IValueDefinitionElement
     {
         public virtual ElementTypes ElementType { get { return ElementTypes.Unknown; } }
         private string _Id;
@@ -196,7 +196,7 @@ namespace AdmxPolicy
         public string RegistryPath { get { return _RegistryPath; } }
         private string _RegistryValueName;
         public string RegistryValueName { get { return _RegistryValueName; } }
-        public ValueDefinitionBase(string id, string registryPath, string registryValueName)
+        public ValueDefinitionElementBase(string id, string registryPath, string registryValueName)
         {
             _Id = id;
             _RegistryPath = registryPath;
@@ -204,7 +204,7 @@ namespace AdmxPolicy
         }
     }
 
-    public sealed class BooleanDefinitionElement : ValueDefinitionBase
+    public sealed class BooleanDefinitionElement : ValueDefinitionElementBase
     {
         public override ElementTypes ElementType { get { return ElementTypes.Boolean; } }
         private ValueDefinition _TrueValue;
@@ -223,7 +223,7 @@ namespace AdmxPolicy
         }
     }
 
-    public sealed class DecimalDefinitionElement : ValueDefinitionBase
+    public sealed class DecimalDefinitionElement : ValueDefinitionElementBase
     {
         public override ElementTypes ElementType { get { return ElementTypes.Decimal; } }
         private bool _Required;
@@ -250,7 +250,7 @@ namespace AdmxPolicy
         }
     }
 
-    public sealed class LongDecimalDefinitionElement : ValueDefinitionBase
+    public sealed class LongDecimalDefinitionElement : ValueDefinitionElementBase
     {
         public override ElementTypes ElementType { get { return ElementTypes.LongDecimal; } }
         private bool _Required;
@@ -277,7 +277,7 @@ namespace AdmxPolicy
         }
     }
 
-    public sealed class TextDefinitionElement : ValueDefinitionBase
+    public sealed class TextDefinitionElement : ValueDefinitionElementBase
     {
         public override ElementTypes ElementType { get { return ElementTypes.Text; } }
         private bool _Required;
@@ -301,7 +301,7 @@ namespace AdmxPolicy
         }
     }
 
-    public sealed class MultiTextDefinitionElement : ValueDefinitionBase
+    public sealed class MultiTextDefinitionElement : ValueDefinitionElementBase
     {
         public override ElementTypes ElementType { get { return ElementTypes.MultiText; } }
         private bool _Required;
@@ -342,7 +342,7 @@ namespace AdmxPolicy
         }
     }
 
-    public sealed class EnumDefinitionElement : ValueDefinitionBase
+    public sealed class EnumDefinitionElement : ValueDefinitionElementBase
     {
         public override ElementTypes ElementType { get { return ElementTypes.Enum; } }
         private bool _Required;
@@ -369,7 +369,7 @@ namespace AdmxPolicy
         }
     }
 
-    public sealed class ListDefinitionElement : ValueDefinitionBase
+    public sealed class ListDefinitionElement : ValueDefinitionElementBase
     {
         public override ElementTypes ElementType { get { return ElementTypes.List; } }
         private string _ValuePrefix;
