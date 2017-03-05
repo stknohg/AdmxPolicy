@@ -325,6 +325,23 @@ namespace AdmxPolicy
         }
     }
 
+    public sealed class EnumValue
+    {
+        private ValueDefinition _Value;
+        public ValueDefinition Value { get { return _Value; } }
+        private ValueDefinitionList _ValueList;
+        public ValueDefinitionList ValueList { get { return _ValueList; } internal set { _ValueList = value; } }
+        public bool HasValueList { get { return (_ValueList != null && _ValueList.Items.Count > 0); } }
+        public EnumValue(ValueDefinition value)
+        {
+            _Value = value;
+        }
+        public override string ToString()
+        {
+            return _Value.ToString();
+        }
+    }
+
     public sealed class EnumDefinitionElement : ValueDefinitionBase
     {
         public override ElementTypes ElementType { get { return ElementTypes.Enum; } }
@@ -335,13 +352,17 @@ namespace AdmxPolicy
         {
             _Required = required;
         }
-        // TODO : implement when item cotains valueList.(e.g. Bits.admx)
-        private List<KeyValuePair<string, ValueDefinition>> _Enums = new List<KeyValuePair<string, ValueDefinition>>();
-        public List<KeyValuePair<string, ValueDefinition>> Enums { get { return _Enums; } }
+        private List<KeyValuePair<string, EnumValue>> _Enums = new List<KeyValuePair<string, EnumValue>>();
+        public List<KeyValuePair<string, EnumValue>> Enums { get { return _Enums; } }
         [System.Management.Automation.HiddenAttribute]
-        public void add_EnumsItem(string displayName, ValueDefinition value)
+        public void add_EnumsItem(string displayName, ValueDefinition value, ValueDefinitionList valueList)
         {
-            _Enums.Add(new KeyValuePair<string, ValueDefinition>(displayName, value));
+            EnumValue enumvalue = new EnumValue(value);
+            if (valueList != null) 
+            {
+                enumvalue.ValueList = valueList;
+            }
+            _Enums.Add(new KeyValuePair<string, EnumValue>(displayName, enumvalue));
         }
         public EnumDefinitionElement(string id, string registryPath, string registryValueName) : base(id, registryPath, registryValueName)
         {

@@ -195,6 +195,17 @@ function TryGetAttribute ([Xml.XmlElement]$Element, [string]$AttributeName, [obj
 }
 
 # Private
+function GetValueListDefinitionFromXmlNode ( [Xml.XmlElement]$Element ) {
+    $defaultKey = TryGetAttribute $Element "defaultKey" ""
+    $Result = New-Object "AdmxPolicy.ValueDefinitionList" -ArgumentList $defaultKey
+    foreach ( $i in $Element.item ) {
+        $Result.Items.Add((New-Object "AdmxPolicy.ListItem" `
+                -ArgumentList ($i.key, $i.valueName, (GetValueDefinitionFromXmlNode -ValueElement $i.value))))
+    }
+    return $Result
+}
+
+# Private
 function GetElementsInfoFromXmlNode ([Xml.XmlElement]$Elements, [AdmxPolicy.AdmlResource]$AdmlResource) {
     $Result = New-Object "AdmxPolicy.ValueDefinitionElements"
     foreach ( $element in $Elements.ChildNodes ) {
@@ -258,14 +269,19 @@ function GetElementsInfoFromXmlNode ([Xml.XmlElement]$Elements, [AdmxPolicy.Adml
                 $item = New-Object "AdmxPolicy.EnumDefinitionElement" -ArgumentList ($id, $registryPath, $registryValueName)
                 $required = TryGetAttribute $element "required" $false
                 $item.set_Properties($required)
-                # TODO : implement when item cotains valueList.(e.g. Bits.admx)
                 foreach ($i in $element.item) {
+                    # key
                     $enumKey = $i.displayName
                     if ( $admlResource.Strings.ContainsKey($enumKey) ) {
                         $enumKey = $admlResource.Strings[$enumKey]
                     }
+                    # value /valueList
                     $enumValue = GetValueDefinitionFromXmlNode -ValueElement $i.value
-                    $item.add_EnumsItem($enumKey, $enumValue)
+                    $valueList = $null
+                    if ( $i.Item("valueList") ) {
+                        $valueList = GetValueListDefinitionFromXmlNode -Element $i.valueList
+                    }
+                    $item.add_EnumsItem($enumKey, $enumValue, $valueList)
                 }
             }
             "list" { 
@@ -307,22 +323,12 @@ function GetValueInfoFromXmlNode ([Xml.XmlElement]$PolicyElement, [AdmxPolicy.Ad
     # list value definitions
     if ( $PolicyElement.Item("enabledList") ) {
         Write-Verbose "Get enabledList information..."
-        $defaultKey = TryGetAttribute $PolicyElement.enabledList "defaultKey" ""
-        $list = New-Object "AdmxPolicy.ValueDefinitionList" -ArgumentList $defaultKey
-        foreach ( $i in $PolicyElement.enabledList.item ) {
-            $list.Items.Add((New-Object "AdmxPolicy.ListItem" `
-                    -ArgumentList ($i.key, $i.valueName, (GetValueDefinitionFromXmlNode -ValueElement $i.value))))
-        }
+        $list = GetValueListDefinitionFromXmlNode -Element $PolicyElement.enabledList
         $Result.set_EnabledListValue($list)
     }
     if ( $PolicyElement.Item("disabledList") ) {
         Write-Verbose "Get disabledList information..."
-        $defaultKey = TryGetAttribute $PolicyElement.disabledList "defaultKey" ""
-        $list = New-Object "AdmxPolicy.ValueDefinitionList" -ArgumentList $defaultKey
-        foreach ( $i in $PolicyElement.disabledList.item ) {
-            $list.Items.Add((New-Object "AdmxPolicy.ListItem" `
-                                -ArgumentList ($i.key, $i.valueName, (GetValueDefinitionFromXmlNode -ValueElement $i.value))))
-        }
+        $list = GetValueListDefinitionFromXmlNode -Element $PolicyElement.disabledList
         $Result.set_DisabledListValue($list)
     }
 

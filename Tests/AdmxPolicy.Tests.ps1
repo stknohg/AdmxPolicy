@@ -180,14 +180,20 @@ Describe "Get-AdmxPolicies" {
         $element.RegistryValueName | Should Be "InstallTrustedOCX"
         $element.Enums.Count | Should Be 3
         $element.Enums[0].Key | Should Be "インストールしない"
-        $element.Enums[0].Value.Type | Should Be "Decimal"
-        $element.Enums[0].Value.Value | Should Be 0
+        $element.Enums[0].Value.Value.Type | Should Be "Decimal"
+        $element.Enums[0].Value.Value.Value | Should Be 0
+        $element.Enums[0].Value.HasValueList | Should Be $false
+        $element.Enums[0].Value.ValueList | Should BeNullOrEmpty
         $element.Enums[1].Key | Should Be "ユーザーに確認する"
-        $element.Enums[1].Value.Type | Should Be "Decimal"
-        $element.Enums[1].Value.Value | Should Be 1
+        $element.Enums[1].Value.Value.Type | Should Be "Decimal"
+        $element.Enums[1].Value.Value.Value | Should Be 1
+        $element.Enums[1].Value.HasValueList | Should Be $false
+        $element.Enums[1].Value.ValueList | Should BeNullOrEmpty
         $element.Enums[2].Key | Should Be "警告なしにインストールする"
-        $element.Enums[2].Value.Type | Should Be "Decimal"
-        $element.Enums[2].Value.Value | Should Be 2
+        $element.Enums[2].Value.Value.Type | Should Be "Decimal"
+        $element.Enums[2].Value.Value.Value | Should Be 2
+        $element.Enums[2].Value.HasValueList | Should Be $false
+        $element.Enums[2].Value.ValueList | Should BeNullOrEmpty
     }
     It "get correct List element value." {
         $policy = Get-AdmxPolicies -FilePath ".\admx\ActiveXInstallService.admx" -CultureName "ja-JP" `
