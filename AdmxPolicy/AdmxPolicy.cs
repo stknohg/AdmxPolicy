@@ -211,12 +211,19 @@ namespace AdmxPolicy
         public ValueDefinition TrueValue { get { return _TrueValue; } }
         private ValueDefinition _FalseValue;
         public ValueDefinition FalseValue { get { return _FalseValue; } }
-        // TODO : implement trueList, falseList.(No admx files has theres elements?)
+        private ValueDefinitionList _TrueList;
+        public ValueDefinitionList TrueList { get { return _TrueList; } }
+        public bool HasTrueList { get { return (_TrueList != null && _TrueList.Items.Count > 0); } }
+        private ValueDefinitionList _FalseList;
+        public ValueDefinitionList FalseList { get { return _FalseList; } }
+        public bool HasFalseList { get { return (_FalseList != null && _FalseList.Items.Count > 0); } }
         [System.Management.Automation.HiddenAttribute]
-        public void set_Properties(ValueDefinition trueValue, ValueDefinition falseValue)
+        public void set_Properties(ValueDefinition trueValue, ValueDefinition falseValue, ValueDefinitionList trueList, ValueDefinitionList falseList)
         {
             _TrueValue = trueValue;
             _FalseValue = falseValue;
+            _TrueList = trueList;
+            _FalseList = falseList;
         }
         public BooleanDefinitionElement(string id, string registryPath, string registryValueName) : base(id, registryPath, registryValueName)
         {

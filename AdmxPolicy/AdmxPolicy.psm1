@@ -158,6 +158,14 @@ function Get-AdmxFileInfo () {
 }
 
 # Private
+function TryGetAttribute ([Xml.XmlElement]$Element, [string]$AttributeName, [object]$Default) {
+    if ( $Element.HasAttribute($AttributeName) ) {
+        return $Element.$AttributeName
+    }
+    return $Default
+}
+
+# Private
 function GetValueDefinitionFromXmlNode ([Xml.XmlElement]$ValueElement) {
     $type = [AdmxPolicy.ValueTypes]::Unknown
     $value = $null
@@ -184,14 +192,6 @@ function GetValueDefinitionFromXmlNode ([Xml.XmlElement]$ValueElement) {
         }
     }
     return New-Object "AdmxPolicy.ValueDefinition" -ArgumentList ($type, $value)
-}
-
-# Private
-function TryGetAttribute ([Xml.XmlElement]$Element, [string]$AttributeName, [object]$Default) {
-    if ( $Element.HasAttribute($AttributeName) ) {
-        return $Element.$AttributeName
-    }
-    return $Default
 }
 
 # Private
@@ -228,8 +228,15 @@ function GetElementsInfoFromXmlNode ([Xml.XmlElement]$Elements, [AdmxPolicy.Adml
                 if ( $element.Item("falseValue") ) {
                     $falseValue = GetValueDefinitionFromXmlNode -ValueElement $element.falseValue
                 }
-                # TODO : implement trueList, falseList.(No admx files has theres elements?)
-                $item.set_Properties($trueValue, $falseValue)
+                $trueList = $null
+                if ( $element.Item("trueList") ) {
+                    $trueList = GetValueListDefinitionFromXmlNode -Element $element.trueList
+                }
+                $falseList = $null
+                if ( $element.Item("falseList") ) {
+                    $falseList = GetValueListDefinitionFromXmlNode -Element $element.falseList
+                }
+                $item.set_Properties($trueValue, $falseValue, $trueList, $falseList)
             }
             "decimal" { 
                 $item = New-Object "AdmxPolicy.DecimalDefinitionElement" -ArgumentList ($id, $registryPath, $registryValueName)

@@ -121,6 +121,10 @@ Describe "Get-AdmxPolicies" {
         $element.TrueValue.Value | Should Be 1
         $element.FalseValue.Type | Should Be "Decimal"
         $element.FalseValue.Value | Should Be 0
+        $element.HasTrueList | Should Be $false
+        $element.TrueList | Should BeNullOrEmpty
+        $element.HasFalseList | Should Be $false
+        $element.FalseList | Should BeNullOrEmpty
     }
     It "get correct Decimal element value." {
         $policy = Get-AdmxPolicies -FilePath ".\admx\DFS.admx" -CultureName "ja-JP" `
