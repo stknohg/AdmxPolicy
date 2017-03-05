@@ -114,14 +114,19 @@ function Get-AdmxFileInfo () {
     param (
         [Parameter(ValueFromPipeline=$true, Mandatory=$true)]
         [string]$FilePath = "",
-        [string]$CultureName = ((Get-Culture).Name)
+        [string]$CultureName = ((Get-Culture).Name),
+        [string]$FallbackCultureName = "en-US"
     )
     begin {
         Write-Verbose "Start Get-AdmxFileInfo..."
         Write-Verbose "CultureName : $CultureName"
+        Write-Verbose "FallbackCultureName : $FallbackCultureName"
         # set default
         if ( $CultureName -eq "" ) {
             $CultureName = (Get-Culture).Name
+        }
+        if ( $FallbackCultureName -eq "" ) {
+            $FallbackCultureName = "en-US"
         }
     }
     process {
@@ -143,11 +148,25 @@ function Get-AdmxFileInfo () {
         }
 
         # get adml resource
-        $admlPath = Join-Path (Split-Path $FilePath -Parent) "$($CultureName)\$([IO.Path]::GetFileNameWithoutExtension($FilePath)).adml"
-        $admlResource = New-Object "AdmxPolicy.AdmlResource"
+        $admlFileName = [IO.Path]::GetFileNameWithoutExtension($FilePath)
+        $admlPath = Join-Path (Split-Path $FilePath -Parent) "$($CultureName)\$($admlFileName).adml"
         if ( -not (Test-Path -LiteralPath $admlPath) ) {
-            Write-Warning "ADML file($admlPath) not found."
+            if ( $CultureName -eq $FallbackCultureName ) {
+                # do not fallback
+                $admlPath = ""
+            } else {
+                Write-Verbose "ADML file($admlPath) not found. Try to fallback $FallbackCultureName ..."
+                $admlPath = Join-Path (Split-Path $FilePath -Parent) "$($FallbackCultureName)\$($admlFileName).adml"
+                if ( -not (Test-Path -LiteralPath $admlPath) ) {
+                    $admlPath = ""
+                }
+            }
+        }
+        if ( $admlPath -eq "" ) {
+            Write-Warning "ADML file($admlFileName) not found."
+            $admlResource = New-Object "AdmxPolicy.AdmlResource"
         } else {
+            Write-Verbose "Get Adml resource from $($admlPath) ..."
             $admlResource = Get-AdmlResource -FilePath $admlPath -ForAdmxId:$true
         }
 
@@ -367,14 +386,19 @@ function Get-AdmxPolicies () {
     param (
         [Parameter(ValueFromPipeline=$true, Mandatory=$true)]
         [string]$FilePath = "",
-        [string]$CultureName = ((Get-Culture).Name)
+        [string]$CultureName = ((Get-Culture).Name),
+        [string]$FallbackCultureName = "en-US"
     )
     begin {
         Write-Verbose "Start Get-AdmxPolicies..."
         Write-Verbose "CultureName : $CultureName"
+        Write-Verbose "FallbackCultureName : $FallbackCultureName"
         # set default
         if ( $CultureName -eq "" ) {
             $CultureName = (Get-Culture).Name
+        }
+        if ( $FallbackCultureName -eq "" ) {
+            $FallbackCultureName = "en-US"
         }
     }
     process {
@@ -396,11 +420,25 @@ function Get-AdmxPolicies () {
         }
 
         # get adml resource
-        $admlPath = Join-Path (Split-Path $FilePath -Parent) "$($CultureName)\$([IO.Path]::GetFileNameWithoutExtension($FilePath)).adml"
-        $admlResource = New-Object "AdmxPolicy.AdmlResource"
+        $admlFileName = [IO.Path]::GetFileNameWithoutExtension($FilePath)
+        $admlPath = Join-Path (Split-Path $FilePath -Parent) "$($CultureName)\$($admlFileName).adml"
         if ( -not (Test-Path -LiteralPath $admlPath) ) {
-            Write-Warning "ADML file($admlPath) not found."
+            if ( $CultureName -eq $FallbackCultureName ) {
+                # do not fallback
+                $admlPath = ""
+            } else {
+                Write-Verbose "ADML file($admlPath) not found. Try to fallback $FallbackCultureName ..."
+                $admlPath = Join-Path (Split-Path $FilePath -Parent) "$($FallbackCultureName)\$($admlFileName).adml"
+                if ( -not (Test-Path -LiteralPath $admlPath) ) {
+                    $admlPath = ""
+                }
+            }
+        }
+        if ( $admlPath -eq "" ) {
+            Write-Warning "ADML file($admlFileName) not found."
+            $admlResource = New-Object "AdmxPolicy.AdmlResource"
         } else {
+            Write-Verbose "Get Adml resource from $($admlPath) ..."
             $admlResource = Get-AdmlResource -FilePath $admlPath -ForAdmxId:$true
         }
 
