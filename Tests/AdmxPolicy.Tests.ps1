@@ -53,7 +53,8 @@ Describe "Get-AdmxPolicies" {
         $policy.DisplayName | Should Be "ActiveX コントロールの承認されたインストール サイト"
         $policy.RegistryType | Should Be LocalMachine
         $policy.RegistryDrives.Count | Should Be 1
-        $policy.RegistryDrives[0] | Should Be "HKLM:"
+        $policy.RegistryDrives[0] | Should Be "HKEY_LOCAL_MACHINE"
+        $policy.RegistryPSDrives[0] | Should Be "HKLM:"
         $policy.RegistryPath | Should Be "SOFTWARE\Policies\Microsoft\Windows\AxInstaller"
     }
     # tests for a single value

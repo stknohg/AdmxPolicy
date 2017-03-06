@@ -87,6 +87,19 @@ namespace AdmxPolicy
             {
                 switch (_RegistryType)
                 {
+                    case RegistryTypes.LocalMachine: { return new string[] { "HKEY_LOCAL_MACHINE" }; }
+                    case RegistryTypes.CurrentUser: { return new string[] { "HKEY_CURRENT_USER" }; }
+                    case RegistryTypes.Both: { return new string[] { "HKEY_LOCAL_MACHINE", "HKEY_CURRENT_USER" }; }
+                    default: { return new string[] { "" }; }
+                }
+            }
+        }
+        public string[] RegistryPSDrives
+        {
+            get
+            {
+                switch (_RegistryType)
+                {
                     case RegistryTypes.LocalMachine: { return new string[] { "HKLM:" }; }
                     case RegistryTypes.CurrentUser: { return new string[] { "HKCU:" }; }
                     case RegistryTypes.Both: { return new string[] { "HKLM:", "HKCU:" }; }
