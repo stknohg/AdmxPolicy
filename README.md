@@ -60,7 +60,7 @@ ExplainText    : このポリシー設定では、組織の標準ユーザーが
 
 
 RegistryType   : LocalMachine
-RegistryDrives : {HKLM:}
+RegistryRootKeys : {HKEY_LOCAL_MACHINE}
 RegistryPath   : SOFTWARE\Policies\Microsoft\Windows\AxInstaller
 ValueInfo      : AdmxPolicy.PolicyValueInfo
 FileName       : ActiveXInstallService.admx
@@ -78,7 +78,9 @@ PS C:\> $policy.DisplayName
 ActiveX コントロールの承認されたインストール サイト
 PS C:\> $policy.RegistryType
 LocalMachine
-PS C:\> $policy.RegistryDrives
+PS C:\> $policy.RegistryRootKeys
+HKEY_LOCAL_MACHINE
+PS C:\> $policy.RegistryPSDrives
 HKLM:
 PS C:\> $policy.RegistryPath
 SOFTWARE\Policies\Microsoft\Windows\AxInstaller
