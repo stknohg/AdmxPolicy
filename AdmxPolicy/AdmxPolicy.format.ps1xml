@@ -59,7 +59,7 @@
                                 <PropertyName>RegistryType</PropertyName>
                             </ListItem>
                             <ListItem>
-                                <PropertyName>RegistryDrives</PropertyName>
+                                <PropertyName>RegistryRootKeys</PropertyName>
                             </ListItem>
                             <ListItem>
                                 <PropertyName>RegistryPath</PropertyName>

@@ -81,7 +81,7 @@ namespace AdmxPolicy
         public string ExplainText { get { return _ExplainText; } }
         private RegistryTypes _RegistryType;
         public RegistryTypes RegistryType { get { return _RegistryType; } }
-        public string[] RegistryDrives
+        public string[] RegistryRootKeys
         {
             get
             {
