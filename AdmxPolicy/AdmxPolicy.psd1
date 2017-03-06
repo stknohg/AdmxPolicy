@@ -3,7 +3,7 @@
 #
 @{
     GUID = 'b05e2e20-3743-443a-b977-5e0b93b418b4'
-    ModuleVersion = '0.5'
+    ModuleVersion = '0.6'
     Description = 'Get Group Policy information from ADMX files.'
 
     Author = 'stknohg'
@@ -22,7 +22,7 @@
             ProjectUri = 'https://github.com/stknohg/AdmxPolicy'
             LicenseUri = 'https://github.com/stknohg/AdmxPolicy/blob/master/LICENSE'
             # IconUri = ''
-            # ReleaseNotes = ''
+            ReleaseNotes = 'https://github.com/stknohg/AdmxPolicy/releases'
             Tags = @('GroupPolicy', 'Admx', 'Adml')
         }
     }
