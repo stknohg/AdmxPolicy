@@ -67,7 +67,7 @@ Describe "Get-AdmxPolicies" {
         $policy.ValueInfo.EnabledValue | Should BeNullOrEmpty
         $policy.ValueInfo.DisabledValue | Should BeNullOrEmpty
     }
-    It "get correct RegistryValueName/EnabledValue/DisabledValue." {
+    It "get correct RegistryValueName/EnabledValue/DisabledValue(value type is Decimal)." {
         $policy = Get-AdmxPolicies -FilePath ".\admx\ActiveXInstallService.admx" -CultureName "ja-JP" `
                     | Where-Object { $_.Name -eq "ApprovedActiveXInstallSites"}
         $policy.ValueInfo | Should Not BeNullOrEmpty
@@ -76,6 +76,16 @@ Describe "Get-AdmxPolicies" {
         $policy.ValueInfo.EnabledValue.Value | Should Be 1
         $policy.ValueInfo.DisabledValue.Type | Should Be Decimal
         $policy.ValueInfo.DisabledValue.Value | Should Be 0
+    }
+    It "get correct RegistryValueName/EnabledValue/DisabledValue(value type is String)." {
+        $policy = Get-AdmxPolicies -FilePath ".\admx\ControlPanelDisplay.admx" -CultureName "ja-JP" `
+                    | Where-Object { $_.Name -eq "CPL_Personalization_EnableScreenSaver"}
+        $policy.ValueInfo | Should Not BeNullOrEmpty
+        $policy.ValueInfo.RegistryValueName | Should Be "ScreenSaveActive"
+        $policy.ValueInfo.EnabledValue.Type | Should Be String
+        $policy.ValueInfo.EnabledValue.Value | Should Be "1"
+        $policy.ValueInfo.DisabledValue.Type | Should Be String
+        $policy.ValueInfo.DisabledValue.Value | Should Be "0"
     }
     # tests for list values.
     It "if a policy doesn't have EnabledList/DisabledList, each property value is null." {

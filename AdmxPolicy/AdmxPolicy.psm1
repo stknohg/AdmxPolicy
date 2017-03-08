@@ -203,7 +203,7 @@ function GetValueDefinitionFromXmlNode ([Xml.XmlElement]$ValueElement) {
         }
         "string" {
             $type = [AdmxPolicy.ValueTypes]::String
-            $value = [string]$ValueElement.FirstChild.value
+            $value = [string]$ValueElement.FirstChild.'#Text'
         }
         Default {
             $type = [AdmxPolicy.ValueTypes]::Unknown
