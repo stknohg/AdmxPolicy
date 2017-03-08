@@ -175,6 +175,13 @@ namespace AdmxPolicy
         }
     }
 
+    public static class DefaultValueDefinition
+    {
+        // maybe, maybe...
+        public static readonly ValueDefinition Enabled = new ValueDefinition(ValueTypes.Decimal, (Int32)1);
+        public static readonly ValueDefinition Disabled = new ValueDefinition(ValueTypes.Delete, null);
+    }
+
     public sealed class ValueDefinitionList
     {
         private List<ListItem> _Items = new List<ListItem>();
