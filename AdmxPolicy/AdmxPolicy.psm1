@@ -195,11 +195,11 @@ function GetValueDefinitionFromXmlNode ([Xml.XmlElement]$ValueElement) {
         }
         "decimal" {
             $type = [AdmxPolicy.ValueTypes]::Decimal
-            $value = [decimal]$ValueElement.FirstChild.value
+            $value = [Int32]$ValueElement.FirstChild.value
         }
         "longdecimal" {
             $type = [AdmxPolicy.ValueTypes]::LongDecimal
-            $value = [decimal]$ValueElement.FirstChild.value
+            $value = [Int64]$ValueElement.FirstChild.value
         }
         "string" {
             $type = [AdmxPolicy.ValueTypes]::String
