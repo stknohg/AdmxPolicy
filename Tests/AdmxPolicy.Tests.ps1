@@ -73,8 +73,10 @@ Describe "Get-AdmxPolicies" {
         $policy.ValueInfo | Should Not BeNullOrEmpty
         $policy.ValueInfo.RegistryValueName | Should Be "ApprovedList"
         $policy.ValueInfo.EnabledValue.Type | Should Be Decimal
+        $policy.ValueInfo.EnabledValue.RegistryType | Should Be DWord
         $policy.ValueInfo.EnabledValue.Value | Should Be 1
         $policy.ValueInfo.DisabledValue.Type | Should Be Decimal
+        $policy.ValueInfo.DisabledValue.RegistryType | Should Be DWord
         $policy.ValueInfo.DisabledValue.Value | Should Be 0
     }
     It "get correct RegistryValueName/EnabledValue/DisabledValue(value type is String)." {
@@ -83,8 +85,10 @@ Describe "Get-AdmxPolicies" {
         $policy.ValueInfo | Should Not BeNullOrEmpty
         $policy.ValueInfo.RegistryValueName | Should Be "ScreenSaveActive"
         $policy.ValueInfo.EnabledValue.Type | Should Be String
+        $policy.ValueInfo.EnabledValue.RegistryType | Should Be String
         $policy.ValueInfo.EnabledValue.Value | Should Be "1"
         $policy.ValueInfo.DisabledValue.Type | Should Be String
+        $policy.ValueInfo.DisabledValue.RegistryType | Should Be String
         $policy.ValueInfo.DisabledValue.Value | Should Be "0"
     }
     # tests for list values.

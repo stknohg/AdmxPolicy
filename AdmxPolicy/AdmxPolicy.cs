@@ -133,10 +133,35 @@ namespace AdmxPolicy
         String
     }
 
+    // same values as Microsoft.Win32.RegistryValueKind
+    public enum RegistryValueKind
+    {
+        Unknown = 0,
+        String = 1,
+        DWord = 4,
+        MultiString = 7,
+        QWord = 11,
+        None = -1
+    }
+
     public sealed class ValueDefinition
     {
         private ValueTypes _Type;
         public ValueTypes Type { get { return _Type; } }
+        public RegistryValueKind RegistryType
+        {
+            get 
+            {
+                switch (_Type)
+                {
+                    case ValueTypes.Delete: { return RegistryValueKind.None; }
+                    case ValueTypes.Decimal: { return RegistryValueKind.DWord; }
+                    case ValueTypes.LongDecimal: { return RegistryValueKind.QWord; }
+                    case ValueTypes.String: { return RegistryValueKind.String; }
+                    default: { return RegistryValueKind.Unknown; }
+                }
+            }
+        }
         private object _Value;
         public object Value { get { return _Value; } }
         public ValueDefinition(ValueTypes type, object value)
