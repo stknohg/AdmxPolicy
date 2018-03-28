@@ -15,7 +15,7 @@ function Get-AdmlResource() {
     [OutputType([AdmxPolicy.AdmlResource])]
     [CmdletBinding()]
     param (
-        [Parameter(ValueFromPipeline=$true, Mandatory=$true)]
+        [Parameter(ValueFromPipeline = $true, Mandatory = $true)]
         [string]$FilePath,
         [switch]$ForAdmxId = $false,
         [switch]$WithWindowsAdml = $false
@@ -76,7 +76,7 @@ function Get-AdmlResource() {
 }
 
 # Private
-function GetAdmxFileInfoFromXml ([string]$Name,  [xml]$Xml, [AdmxPolicy.AdmlResource]$AdmlResource) {
+function GetAdmxFileInfoFromXml ([string]$Name, [xml]$Xml, [AdmxPolicy.AdmlResource]$AdmlResource) {
     $Result = New-Object "AdmxPolicy.AdmxFileInfo" -ArgumentList ($Name, $AdmlResource.DisplayName, $AdmlResource.Description)
     try {
         $categories = $xml.policyDefinitions.categories.category
@@ -112,7 +112,7 @@ function Get-AdmxFileInfo () {
     [OutputType([AdmxPolicy.AdmxFileInfo])]
     [CmdletBinding()]
     param (
-        [Parameter(ValueFromPipeline=$true, Mandatory=$true)]
+        [Parameter(ValueFromPipeline = $true, Mandatory = $true)]
         [string]$FilePath = "",
         [string]$CultureName = ((Get-Culture).Name),
         [string]$FallbackCultureName = "en-US"
@@ -219,7 +219,7 @@ function GetValueListDefinitionFromXmlNode ( [Xml.XmlElement]$Element ) {
     $Result = New-Object "AdmxPolicy.ValueDefinitionList" -ArgumentList $defaultKey
     foreach ( $i in $Element.item ) {
         $Result.Items.Add((New-Object "AdmxPolicy.ListItem" `
-                -ArgumentList ($i.key, $i.valueName, (GetValueDefinitionFromXmlNode -ValueElement $i.value))))
+                    -ArgumentList ($i.key, $i.valueName, (GetValueDefinitionFromXmlNode -ValueElement $i.value))))
     }
     return $Result
 }
@@ -384,7 +384,7 @@ function Get-AdmxPolicies () {
     [OutputType([AdmxPolicy.PolicyInfo])]
     [CmdletBinding()]
     param (
-        [Parameter(ValueFromPipeline=$true, Mandatory=$true)]
+        [Parameter(ValueFromPipeline = $true, Mandatory = $true)]
         [string]$FilePath = "",
         [string]$CultureName = ((Get-Culture).Name),
         [string]$FallbackCultureName = "en-US"
