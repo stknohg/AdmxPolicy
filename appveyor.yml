@@ -2,6 +2,7 @@ image: Visual Studio 2017
 install:
 - ps: >-
     Install-PackageProvider -Name NuGet -Force
+    
     Install-Module Pester -Scope CurrentUser -Force -SkipPublisherCheck
 build: off
 test_script:
