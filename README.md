@@ -1,10 +1,12 @@
 # AdmxPolicy
 
+[![Build status](https://ci.appveyor.com/api/projects/status/jsa7ayx1qa1yj03s?svg=true)](https://ci.appveyor.com/project/stknohg/admxpolicy)
+
 Get Group Policy information from ADMX files.  
 
 ## How to Install
 
-You can install from [PowerShell Gallery](https://www.powershellgallery.com/packages/AdmxPolicy/).
+You can install it from [PowerShell Gallery](https://www.powershellgallery.com/packages/AdmxPolicy/).
 
 ```ps1
 Install-Module -Name AdmxPolicy -Scope CurrentUser
@@ -100,4 +102,4 @@ List        ApprovedActiveXInstallSiteslist SOFTWARE\Policies\Microsoft\Windows\
 
 ## License
 
-MIT
+[MIT](./LICENSE)
