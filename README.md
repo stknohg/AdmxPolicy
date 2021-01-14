@@ -1,7 +1,5 @@
 # AdmxPolicy
 
-[![Build status](https://ci.appveyor.com/api/projects/status/jsa7ayx1qa1yj03s?svg=true)](https://ci.appveyor.com/project/stknohg/admxpolicy)
-
 Get Group Policy information from ADMX files.  
 
 ## How to Install
