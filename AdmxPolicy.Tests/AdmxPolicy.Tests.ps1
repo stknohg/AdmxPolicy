@@ -1,15 +1,16 @@
-﻿Import-Module Pester
-Import-Module (Join-Path (Split-Path $PSScriptRoot -Parent) "\AdmxPolicy") -Force
+﻿BeforeAll {
+    Import-Module (Join-Path (Split-Path $PSScriptRoot -Parent) "\AdmxPolicy\AdmxPolicy.psd1") -Force
+}
 
 Describe "Get-AdmlResource" {
     It "if the adml file was not found, throw exception." { 
-        ( { Get-AdmlResource -FilePath ".\admx\notfound.adml" }) | Should -Throw "not found."
+        ( { Get-AdmlResource -FilePath "$PSScriptRoot\admx\notfound.adml" }) | Should -Throw "*not found."
     }
     It "if the file extension was invalid, throw exception." { 
-        ( { Get-AdmlResource -FilePath ".\admx\InvalidExtension.admz" }) | Should -Throw "must be .adml file."
+        ( { Get-AdmlResource -FilePath "$PSScriptRoot\admx\InvalidExtension.admz" }) | Should -Throw "*must be .adml file."
     }
     It "get correct string messages." {
-        $resource = Get-AdmlResource -FilePath ".\admx\ja-JP\ActiveXInstallService.adml"
+        $resource = Get-AdmlResource -FilePath "$PSScriptRoot\admx\ja-JP\ActiveXInstallService.adml"
         $resource.DisplayName | Should -Be "ActiveX Installer Service"
         $resource.Description | Should -Be "承認されたインストール サイトから ActiveX コントロールをインストールする"
         $resource.Strings.Count | Should -Be 8
@@ -19,13 +20,13 @@ Describe "Get-AdmlResource" {
 
 Describe "Get-AdmxFileInfo" {
     It "if the admx file was not found, throw exception." { 
-        ( { Get-AdmxFileInfo -FilePath ".\admx\notfound.admx" }) | Should -Throw "not found."
+        ( { Get-AdmxFileInfo -FilePath "$PSScriptRoot\admx\notfound.admx" }) | Should -Throw "*not found."
     }
     It "if the file extension was invalid, throw exception." { 
-        ( { Get-AdmxFileInfo -FilePath ".\admx\InvalidExtension.admz" }) | Should -Throw "must be .admx file."
+        ( { Get-AdmxFileInfo -FilePath "$PSScriptRoot\admx\InvalidExtension.admz" }) | Should -Throw "*must be .admx file."
     }
     It "get correct file information." {
-        $fileInfo = Get-AdmxFileInfo -FilePath ".\admx\ActiveXInstallService.admx" -CultureName "ja-JP"
+        $fileInfo = Get-AdmxFileInfo -FilePath "$PSScriptRoot\admx\ActiveXInstallService.admx" -CultureName "ja-JP"
         $fileInfo.Name | Should -Be "ActiveXInstallService.admx"
         $fileInfo.DisplayName | Should -Be "ActiveX Installer Service"
         $fileInfo.Description | Should -Be "承認されたインストール サイトから ActiveX コントロールをインストールする"
@@ -36,17 +37,17 @@ Describe "Get-AdmxFileInfo" {
 
 Describe "Get-AdmxPolicies" {
     It "if the admx file was not found, throw exception." { 
-        ( { Get-AdmxPolicies -FilePath ".\admx\notfound.admx" }) | Should -Throw "not found."
+        ( { Get-AdmxPolicies -FilePath "$PSScriptRoot\admx\notfound.admx" }) | Should -Throw "*not found."
     }
     It "if the file extension was invalid, throw exception." { 
-        ( { Get-AdmxPolicies -FilePath ".\admx\InvalidExtension.admz" }) | Should -Throw "must be .admx file."
+        ( { Get-AdmxPolicies -FilePath "$PSScriptRoot\admx\InvalidExtension.admz" }) | Should -Throw "*must be .admx file."
     }
     It "get correct policy counts." {
-        $policies = Get-AdmxPolicies -FilePath ".\admx\ActiveXInstallService.admx" -CultureName "ja-JP"
+        $policies = Get-AdmxPolicies -FilePath "$PSScriptRoot\admx\ActiveXInstallService.admx" -CultureName "ja-JP"
         $policies.Count | Should -Be 2
     }
     It "get correct policy information." {
-        $policy = Get-AdmxPolicies -FilePath ".\admx\ActiveXInstallService.admx" -CultureName "ja-JP" `
+        $policy = Get-AdmxPolicies -FilePath "$PSScriptRoot\admx\ActiveXInstallService.admx" -CultureName "ja-JP" `
             | Where-Object { $_.Name -eq "ApprovedActiveXInstallSites"}
         $policy | Should -Not -BeNullOrEmpty
         $policy.FileName | Should -Be "ActiveXInstallService.admx"
@@ -60,7 +61,7 @@ Describe "Get-AdmxPolicies" {
     }
     # tests for a single value
     It "if a policy doesn't have EnabledValue/DisabledValue, each property value is null." {
-        $policy = Get-AdmxPolicies -FilePath ".\admx\ActiveXInstallService.admx" -CultureName "ja-JP" `
+        $policy = Get-AdmxPolicies -FilePath "$PSScriptRoot\admx\ActiveXInstallService.admx" -CultureName "ja-JP" `
             | Where-Object { $_.Name -eq "AxISURLZonePolicies"}
         $policy.ValueInfo | Should -Not -BeNullOrEmpty
         $policy.ValueInfo.RegistryValueName | Should -BeNullOrEmpty
@@ -68,7 +69,7 @@ Describe "Get-AdmxPolicies" {
         $policy.ValueInfo.DisabledValue | Should -BeNullOrEmpty
     }
     It "get correct RegistryValueName/EnabledValue/DisabledValue(value type is Decimal)." {
-        $policy = Get-AdmxPolicies -FilePath ".\admx\ActiveXInstallService.admx" -CultureName "ja-JP" `
+        $policy = Get-AdmxPolicies -FilePath "$PSScriptRoot\admx\ActiveXInstallService.admx" -CultureName "ja-JP" `
             | Where-Object { $_.Name -eq "ApprovedActiveXInstallSites"}
         $policy.ValueInfo | Should -Not -BeNullOrEmpty
         $policy.ValueInfo.RegistryValueName | Should -Be "ApprovedList"
@@ -80,7 +81,7 @@ Describe "Get-AdmxPolicies" {
         $policy.ValueInfo.DisabledValue.Value | Should -Be 0
     }
     It "get correct RegistryValueName/EnabledValue/DisabledValue(value type is String)." {
-        $policy = Get-AdmxPolicies -FilePath ".\admx\ControlPanelDisplay.admx" -CultureName "ja-JP" `
+        $policy = Get-AdmxPolicies -FilePath "$PSScriptRoot\admx\ControlPanelDisplay.admx" -CultureName "ja-JP" `
             | Where-Object { $_.Name -eq "CPL_Personalization_EnableScreenSaver"}
         $policy.ValueInfo | Should -Not -BeNullOrEmpty
         $policy.ValueInfo.RegistryValueName | Should -Be "ScreenSaveActive"
@@ -93,7 +94,7 @@ Describe "Get-AdmxPolicies" {
     }
     # tests for list values.
     It "if a policy doesn't have EnabledList/DisabledList, each property value is null." {
-        $policy = Get-AdmxPolicies -FilePath ".\admx\ActiveXInstallService.admx" -CultureName "ja-JP" `
+        $policy = Get-AdmxPolicies -FilePath "$PSScriptRoot\admx\ActiveXInstallService.admx" -CultureName "ja-JP" `
             | Where-Object { $_.Name -eq "ApprovedActiveXInstallSites"}
         $policy.ValueInfo | Should -Not -BeNullOrEmpty
         $policy.ValueInfo.HasEnabledList | Should -Be $false
@@ -102,7 +103,7 @@ Describe "Get-AdmxPolicies" {
         $policy.ValueInfo.DisabledList | Should -BeNullOrEmpty
     }
     It "get correct EnabledList/DisabledList value." {
-        $policy = Get-AdmxPolicies -FilePath ".\admx\DiskDiagnostic.admx" -CultureName "ja-JP" `
+        $policy = Get-AdmxPolicies -FilePath "$PSScriptRoot\admx\DiskDiagnostic.admx" -CultureName "ja-JP" `
             | Where-Object { $_.Name -eq "WdiScenarioExecutionPolicy"}
         $policy.ValueInfo | Should -Not -BeNullOrEmpty
         $policy.ValueInfo.HasEnabledList | Should -Be $true
@@ -118,14 +119,14 @@ Describe "Get-AdmxPolicies" {
     }
     # tests for Elements values.
     It "if a policy doesn't have Elements, each property value is null." {
-        $policy = Get-AdmxPolicies -FilePath ".\admx\DiskDiagnostic.admx" -CultureName "ja-JP" `
+        $policy = Get-AdmxPolicies -FilePath "$PSScriptRoot\admx\DiskDiagnostic.admx" -CultureName "ja-JP" `
             | Where-Object { $_.Name -eq "WdiScenarioExecutionPolicy"}
         $policy.ValueInfo | Should -Not -BeNullOrEmpty
         $policy.ValueInfo.HasElements | Should -Be $false
         $policy.ValueInfo.Elements | Should -BeNullOrEmpty
     }
     It "get correct Boolean element value." {
-        $policy = Get-AdmxPolicies -FilePath ".\admx\ActiveXInstallService.admx" -CultureName "ja-JP" `
+        $policy = Get-AdmxPolicies -FilePath "$PSScriptRoot\admx\ActiveXInstallService.admx" -CultureName "ja-JP" `
             | Where-Object { $_.Name -eq "AxISURLZonePolicies"}
         $policy.ValueInfo | Should -Not -BeNullOrEmpty
         $policy.ValueInfo.HasElements | Should -Be $true
@@ -144,7 +145,7 @@ Describe "Get-AdmxPolicies" {
         $element.FalseList | Should -BeNullOrEmpty
     }
     It "get correct Decimal element value." {
-        $policy = Get-AdmxPolicies -FilePath ".\admx\DFS.admx" -CultureName "ja-JP" `
+        $policy = Get-AdmxPolicies -FilePath "$PSScriptRoot\admx\DFS.admx" -CultureName "ja-JP" `
             | Where-Object { $_.Name -eq "DFSDiscoverDC"}
         $policy.ValueInfo | Should -Not -BeNullOrEmpty
         $policy.ValueInfo.HasElements | Should -Be $true
@@ -160,7 +161,7 @@ Describe "Get-AdmxPolicies" {
     }
     # LongDecial doesn't exists?
     It "get correct Text element value." {
-        $policy = Get-AdmxPolicies -FilePath ".\admx\DiskDiagnostic.admx" -CultureName "ja-JP" `
+        $policy = Get-AdmxPolicies -FilePath "$PSScriptRoot\admx\DiskDiagnostic.admx" -CultureName "ja-JP" `
             | Where-Object { $_.Name -eq "DfdAlertPolicy"}
         $policy.ValueInfo | Should -Not -BeNullOrEmpty
         $policy.ValueInfo.HasElements | Should -Be $true
@@ -175,7 +176,7 @@ Describe "Get-AdmxPolicies" {
         $element.Soft | Should -Be $false
     }
     It "get correct MultiText element value." {
-        $policy = Get-AdmxPolicies -FilePath ".\admx\CipherSuiteOrder.admx" -CultureName "ja-JP" `
+        $policy = Get-AdmxPolicies -FilePath "$PSScriptRoot\admx\CipherSuiteOrder.admx" -CultureName "ja-JP" `
             | Where-Object { $_.Name -eq "SSLCurveOrder"}
         $policy.ValueInfo | Should -Not -BeNullOrEmpty
         $policy.ValueInfo.HasElements | Should -Be $true
@@ -190,7 +191,7 @@ Describe "Get-AdmxPolicies" {
         $element.Soft | Should -Be $false
     }
     It "get correct Enum element value." {
-        $policy = Get-AdmxPolicies -FilePath ".\admx\ActiveXInstallService.admx" -CultureName "ja-JP" `
+        $policy = Get-AdmxPolicies -FilePath "$PSScriptRoot\admx\ActiveXInstallService.admx" -CultureName "ja-JP" `
             | Where-Object { $_.Name -eq "AxISURLZonePolicies"}
         $policy.ValueInfo | Should -Not -BeNullOrEmpty
         $policy.ValueInfo.HasElements | Should -Be $true
@@ -217,7 +218,7 @@ Describe "Get-AdmxPolicies" {
         $element.Enums[2].Value.ValueList | Should -BeNullOrEmpty
     }
     It "get correct List element value." {
-        $policy = Get-AdmxPolicies -FilePath ".\admx\ActiveXInstallService.admx" -CultureName "ja-JP" `
+        $policy = Get-AdmxPolicies -FilePath "$PSScriptRoot\admx\ActiveXInstallService.admx" -CultureName "ja-JP" `
             | Where-Object { $_.Name -eq "ApprovedActiveXInstallSites"}
         $policy.ValueInfo | Should -Not -BeNullOrEmpty
         $policy.ValueInfo.HasElements | Should -Be $true
